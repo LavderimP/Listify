@@ -158,11 +158,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # * Cors-Headers and CSRF configuration
-ALLOWED_HOST = ["https://localhost:8000", "https://127.0.0.1:3000"]
+ALLOWED_HOST = ["https://127.0.0.1:8000", "http://localhost:3000"]
 CORS_ALLOW_ALL_ORIGINS = True
 # CSRF_COOKIE_DOMAIN = '104.248.170.54'
-CORS_ORIGIN_WHITELIST = ["https://localhost:8000", "https://127.0.0.1:3000"]
-CSRF_TRUSTED_ORIGINS = ["https://localhost:8000", "https://127.0.0.1:3000"]
+CORS_ORIGIN_WHITELIST = ["https://127.0.0.1:8000", "http://localhost:3000"]
+CSRF_TRUSTED_ORIGINS = ["https://127.0.0.1:8000", "http://localhost:3000"]
 
 
 # * Axes configuration

@@ -1,0 +1,18 @@
+.container {
+  padding: 20px;
+}
+
+.list-wrapper {
+  display: flex; /* Use flexbox */
+  flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
+  gap: 10px; /* Space between items */
+}
+
+.task-wrapper {
+  background-color: #f0f0f0; /* Background color for each task */
+  padding: 10px; /* Padding inside each task */
+  border: 1px solid #ccc; /* Optional border */
+  border-radius: 5px; /* Optional rounded corners */
+  flex: 1 1 calc(33% - 10px); /* Flex-grow, flex-shrink, and basis for responsive layout */
+  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+}

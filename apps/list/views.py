@@ -5,6 +5,9 @@ from profiles.models import Profiles
 from .serializers import ListSerializer, ListDetailSerializer
 from django.shortcuts import get_object_or_404
 
+# ! To Be Removed
+from rest_framework.permissions import AllowAny
+
 
 # TODO: List Pictures
 
@@ -12,10 +15,16 @@ from django.shortcuts import get_object_or_404
 # * List Views
 class ListViewSet(viewsets.ViewSet):
 
+    # ! To Be Removed
+    permission_classes = [AllowAny]
+
     def list(self, request):
         # Use get_object_or_404 to handle the case where the profile does not exist
-        user_profile = get_object_or_404(Profiles, user=request.user.id)
-        queryset = List.objects.filter(profile=user_profile)
+        # user_profile = get_object_or_404(Profiles, user=request.user.id)
+        # queryset = List.objects.filter(profile=user_profile)
+
+        queryset = List.objects.all().order_by("created_at")
+
         # Use ListSerializer for list view to hide private content
         serializer = ListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

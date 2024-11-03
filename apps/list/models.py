@@ -21,9 +21,11 @@ class List(models.Model):
         ("task", "Task"),
         ("shop", "Shop"),
     ]
-    categories = models.CharField(max_length=10, choices=STATUS_CHOICES, null=True)
+    categories = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, null=True, blank=True
+    )
     text = models.TextField(max_length=500, null=True, blank=True)
-    private = models.BooleanField(default=False)
+    private = models.BooleanField(default=False, null=True, blank=True)
     private_pass = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):

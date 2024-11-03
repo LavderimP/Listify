@@ -60,6 +60,7 @@ class ListSerializer(serializers.ModelSerializer):
             return {
                 "list_id": instance.list_id,
                 "title": instance.title,
+                "categories": instance.categories,
                 "private": instance.private,
             }
 
