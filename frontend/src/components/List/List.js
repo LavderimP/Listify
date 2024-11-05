@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import Delete from "./Delete";
 import "./List.css";
-import { BsFileLock2Fill } from "react-icons/bs";
-import { BsFileLockFill } from "react-icons/bs";
-// import Detail from "../Detail/Detail";
+import {
+  BsFileLock2Fill,
+  BsFileLockFill,
+  BsFillPencilFill,
+  BsFillTrash3Fill,
+} from "react-icons/bs";
 
-const List = () => {
-  // * Initializing state
+function List() {
   const [lists, setLists] = useState([]);
+  const [fetching, setFetching] = useState(true); // State to manage fetching
+  const navigate = useNavigate();
 
-  // *  Our CsrfToken
   const getCookie = (name) => {
     let cookieValue = null;
     if (document.cookie && document.cookie !== "") {
       const cookies = document.cookie.split(";");
       for (let i = 0; i < cookies.length; i++) {
         const cookie = cookies[i].trim();
-        // Does this cookie string begin with the name we want?
         if (cookie.substring(0, name.length + 1) === name + "=") {
           cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
           break;
@@ -25,18 +29,18 @@ const List = () => {
     return cookieValue;
   };
 
-  const handleEditClick = (list) => {
-    console.log("Edit button clicked for index:", list.categories);
-    // Additional logic for editing can go here
+  const handleEditClick = (listId) => {
+    navigate(`/detail/${listId}`);
   };
 
-  const handleDeleteClick = (index) => {
-    console.log("Delete button clicked for index:", index);
-    // Additional logic for deleting can go here
+  const handleDeleteClick = (listId) => {
+    const csrftoken = getCookie("csrftoken");
+    Delete(listId, csrftoken);
+    // Set fetching to true after delete
+    setFetching(true);
   };
 
-  useEffect(() => {
-    console.log("Its mounting");
+  const fetchLists = useCallback(() => {
     const url = "http://127.0.0.1:8000/list/";
     const csrftoken = getCookie("csrftoken");
 
@@ -48,45 +52,47 @@ const List = () => {
       },
     })
       .then((response) => response.json())
-      .then((data) => setLists(data))
+      .then((data) => {
+        setLists(data);
+        setFetching(false); // Stop fetching when data is retrieved
+      })
       .catch((error) => {
         console.log("Error: ", error);
       });
-  }, []); // Empty dependency array to run only once on mount
+  }, []); // No dependencies for this fetch function
 
-  // * Render method
+  useEffect(() => {
+    if (fetching) {
+      fetchLists();
+    }
+  }, [fetching, fetchLists]); // Add fetchLists to dependencies
+
   return (
     <div className="container">
       <h1>Lists</h1>
+      <p className="container d-flex justify-content-end">Add</p>
       <div className="list-wrapper">
-        {lists.map((list, index) => (
-          <div key={index} className="task-wrapper">
-            <div style={{ flex: 7 }}>
-              <span>
-                <p>Title: {list.title}</p>
-                <p>ID: {list.list_id}</p>
-                <p>Category: {list.categories}</p>
-                <p>
-                  Private:{" "}
-                  {list.private ? <BsFileLock2Fill /> : <BsFileLockFill />}
-                </p>
-                {!list.private && <p>Text: {list.text}</p>}
-              </span>
-            </div>
-            <div style={{ flex: 1 }}>
+        {lists.map((list) => (
+          <div key={list.list_id} className="task-wrapper">
+            <p>Title: {list.title}</p>
+            <p>ID: {list.list_id}</p>
+            <p>Category: {list.categories}</p>
+            <p>
+              Private: {list.private ? <BsFileLock2Fill /> : <BsFileLockFill />}
+            </p>
+            {!list.private && <p>Text: {list.text}</p>}
+            <div className="button-container">
               <button
                 className="btn btn-sm btn-outline-info"
-                onClick={() => handleEditClick(list)}
+                onClick={() => handleEditClick(list.list_id)}
               >
-                Edit
+                <BsFillPencilFill />
               </button>
-            </div>
-            <div style={{ flex: 1 }}>
               <button
                 className="btn btn-sm btn-outline-dark delete"
-                onClick={() => handleDeleteClick(index)}
+                onClick={() => handleDeleteClick(list.list_id)}
               >
-                X
+                <BsFillTrash3Fill />
               </button>
             </div>
           </div>
@@ -94,6 +100,6 @@ const List = () => {
       </div>
     </div>
   );
-};
+}
 
 export default List;
