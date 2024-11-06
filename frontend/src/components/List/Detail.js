@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom"; // Import useParams
-import { BsFileLock2Fill, BsFileLockFill } from "react-icons/bs"; // Import icons
+import { BsFillUnlockFill, BsLockFill } from "react-icons/bs"; // Import icons
 import "./Detail.css";
 
-function Detail({ onUpdate }) {
+function Detail({ onUpdate, accessToken }) {
   const { id } = useParams(); // Get the ID from the URL
   const [listData, setListData] = useState({
     title: "",
@@ -38,6 +38,7 @@ function Detail({ onUpdate }) {
           headers: {
             "Content-type": "application/json",
             "X-CSRFToken": csrftoken,
+            Authorization: `Bearer ${accessToken}`, // Add the Authorization header
           },
         });
         const data = await response.json();
@@ -48,7 +49,7 @@ function Detail({ onUpdate }) {
     };
 
     fetchListDetails();
-  }, [id]);
+  }, [id, accessToken]); // Add accessToken to the dependency array
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -67,6 +68,7 @@ function Detail({ onUpdate }) {
       headers: {
         "Content-type": "application/json",
         "X-CSRFToken": csrftoken,
+        Authorization: `Bearer ${accessToken}`, // Add the Authorization header
       },
       body: JSON.stringify(listData),
     })
@@ -129,12 +131,13 @@ function Detail({ onUpdate }) {
             }}
           >
             {listData.private ? (
-              <BsFileLock2Fill
-                style={{ marginLeft: "8px", color: "green", fontSize: "24px" }}
-              />
+              <BsLockFill style={{ fontSize: "20px", marginLeft: "5px" }} />
             ) : (
-              <BsFileLockFill
-                style={{ marginLeft: "8px", color: "red", fontSize: "24px" }}
+              <BsFillUnlockFill
+                style={{
+                  fontSize: "20px",
+                  marginLeft: "5px",
+                }}
               />
             )}
           </span>

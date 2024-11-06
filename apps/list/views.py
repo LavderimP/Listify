@@ -20,10 +20,8 @@ class ListViewSet(viewsets.ViewSet):
 
     def list(self, request):
         # Use get_object_or_404 to handle the case where the profile does not exist
-        # user_profile = get_object_or_404(Profiles, user=request.user.id)
-        # queryset = List.objects.filter(profile=user_profile)
-
-        queryset = List.objects.all().order_by("created_at")
+        user_profile = get_object_or_404(Profiles, user=request.user.id)
+        queryset = List.objects.filter(profile=user_profile).order_by("created_at")
 
         # Use ListSerializer for list view to hide private content
         serializer = ListSerializer(queryset, many=True)
@@ -51,12 +49,12 @@ class ListViewSet(viewsets.ViewSet):
         list_instance = get_object_or_404(List, list_id=pk)
 
         # Check if the list is private and if the user is the owner
-        # if list_instance.private and list_instance.profile.user != request.user:
-        #     # If private and not owner, return limited data
-        #     serializer = ListSerializer(list_instance)
-        # else:
-        # If public or user is owner, return full data
-        serializer = ListDetailSerializer(list_instance)
+        if list_instance.private and list_instance.profile.user != request.user:
+            # If private and not owner, return limited data
+            serializer = ListSerializer(list_instance)
+        else:
+            # If public or user is owner, return full data
+            serializer = ListDetailSerializer(list_instance)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -64,11 +62,11 @@ class ListViewSet(viewsets.ViewSet):
         list_instance = get_object_or_404(List, list_id=pk)
 
         # Only allow update if user is the owner
-        # if list_instance.profile.user != request.user:
-        #     return Response(
-        #         {"detail": "You do not have permission to update this list."},
-        #         status=status.HTTP_403_FORBIDDEN,
-        #     )
+        if list_instance.profile.user != request.user:
+            return Response(
+                {"detail": "You do not have permission to update this list."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         serializer = ListDetailSerializer(list_instance, data=request.data)
         if serializer.is_valid():
@@ -80,11 +78,11 @@ class ListViewSet(viewsets.ViewSet):
         list_instance = get_object_or_404(List, list_id=pk)
 
         # Only allow deletion if user is the owner
-        # if list_instance.profile.user != request.user:
-        #     return Response(
-        #         {"detail": "You do not have permission to delete this list."},
-        #         status=status.HTTP_403_FORBIDDEN,
-        #     )
+        if list_instance.profile.user != request.user:
+            return Response(
+                {"detail": "You do not have permission to delete this list."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
 
         list_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

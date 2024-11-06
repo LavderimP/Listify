@@ -2,11 +2,17 @@ import React from "react";
 import "./NavBar.css";
 import { useNavigate } from "react-router-dom"; // Use useNavigate
 
-function NavBar() {
+function NavBar({ onLogout }) {
   const navigate = useNavigate();
 
   const handleListClick = () => {
     navigate(`/`);
+  };
+
+  const handleLogoutClick = () => {
+    // Call the onLogout function to clear tokens and perform any other necessary actions
+    onLogout();
+    navigate("/"); // Optionally redirect to home after logout
   };
 
   return (
@@ -57,7 +63,11 @@ function NavBar() {
           </li>
           {/* LogOut */}
           <li className="nav-button">
-            <button type="button" className="btn btn-light">
+            <button
+              type="button"
+              className="btn btn-light"
+              onClick={handleLogoutClick}
+            >
               LogOut
             </button>
           </li>
