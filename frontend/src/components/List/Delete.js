@@ -1,4 +1,4 @@
-function Delete(index, csrftoken) {
+function Delete(index, csrftoken, accessToken) {
   const url = `http://127.0.0.1:8000/list/${index}/`;
 
   fetch(url, {
@@ -6,6 +6,7 @@ function Delete(index, csrftoken) {
     headers: {
       "Content-type": "application/json",
       "X-CSRFToken": csrftoken,
+      Authorization: `Bearer ${accessToken}`, // Add the Authorization header
     },
   })
     .then((response) => {

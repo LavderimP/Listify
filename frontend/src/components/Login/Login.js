@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import "./Login.css";
-import Detail from "../Detail/Detail";
 
-function Login() {
+function Login({ onLogin }) {
   const [activeItem, setActiveItem] = useState({
     username: "",
     password: "",
   });
-  const [accessToken, setAccessToken] = useState("");
-  const [refreshToken, setRefreshToken] = useState("");
+
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,7 +33,6 @@ function Login() {
   };
 
   const loginApiCall = () => {
-    console.log("loginApiCall");
     const url = "http://127.0.0.1:8000/login/";
     const csrftoken = getCookie("csrftoken");
 
@@ -57,11 +55,15 @@ function Login() {
           username: "",
           password: "",
         });
-        setAccessToken(data.access);
-        setRefreshToken(data.refresh);
+
+        // If the login is successful, pass the token back to the parent
+        if (data.access) {
+          onLogin(data.access, data.refresh); // Pass access token to parent component
+        }
       })
       .catch((error) => {
-        console.log("Error: ", error);
+        setError("Login failed. Please try again.");
+        console.error("Error:", error);
       });
   };
 
@@ -92,22 +94,22 @@ function Login() {
               <input
                 id="pass-input"
                 name="password"
-                type="text" // ! to be changed to password
+                type="password" // Changed to password
                 placeholder="password here"
                 onChange={handleChange}
                 value={activeItem.password}
               />
             </div>
           </div>
+          {error && (
+            <p className="error" style={{ color: "red" }}>
+              {error}
+            </p>
+          )}
           <div className="task-wrapper">
             <button className="login-button" type="submit">
               Login
             </button>
-            <div className="ToBeDeleted">
-              Access: {accessToken}
-              <br />
-              Refresh: {refreshToken}
-            </div>
           </div>
         </form>
       </div>
