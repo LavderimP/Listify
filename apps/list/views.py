@@ -6,7 +6,7 @@ from .serializers import ListSerializer, ListDetailSerializer
 from django.shortcuts import get_object_or_404
 
 # ! To Be Removed
-from rest_framework.permissions import AllowAny
+# from rest_framework.permissions import AllowAny
 
 
 # TODO: List Pictures
@@ -15,13 +15,24 @@ from rest_framework.permissions import AllowAny
 # * List Views
 class ListViewSet(viewsets.ViewSet):
 
-    # ! To Be Removed
-    permission_classes = [AllowAny]
+    # # ! To Be Removed
+    # permission_classes = [AllowAny]
 
     def list(self, request):
+
         # Use get_object_or_404 to handle the case where the profile does not exist
         user_profile = get_object_or_404(Profiles, user=request.user.id)
-        queryset = List.objects.filter(profile=user_profile).order_by("created_at")
+        if user_profile is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        categories = request.query_params.get("categories")
+
+        if categories is None:
+            queryset = List.objects.filter(profile=user_profile).order_by("created_at")
+        else:
+            queryset = List.objects.filter(
+                profile=user_profile, categories=categories
+            ).order_by("created_at")
 
         # Use ListSerializer for list view to hide private content
         serializer = ListSerializer(queryset, many=True)
@@ -46,10 +57,13 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
+        user_profile = request.user
+        if user_profile is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
         list_instance = get_object_or_404(List, list_id=pk)
 
         # Check if the list is private and if the user is the owner
-        if list_instance.private and list_instance.profile.user != request.user:
+        if list_instance.private and list_instance.profile.user != user_profile:
             # If private and not owner, return limited data
             serializer = ListSerializer(list_instance)
         else:
@@ -59,6 +73,11 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
+
+        user_profile = request.user
+        if user_profile is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         list_instance = get_object_or_404(List, list_id=pk)
 
         # Only allow update if user is the owner
@@ -75,6 +94,11 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
+
+        user_profile = request.user
+        if user_profile is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
         list_instance = get_object_or_404(List, list_id=pk)
 
         # Only allow deletion if user is the owner
