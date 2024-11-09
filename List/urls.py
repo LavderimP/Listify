@@ -9,9 +9,13 @@ from django.views.generic import TemplateView
 from rest_framework_simplejwt.views import TokenRefreshView
 from .token import MyTokenObtainPairView
 
+# * User
+from user.views import UserView
+
 urlpatterns = [
-    path("", TemplateView.as_view(template_name="index.html")),
+    # path("", TemplateView.as_view(template_name="index.html")),
     path("admin/", admin.site.urls),
+    path("register/", UserView.as_view({"post": "create"}), name="user_register"),
     path("login/", MyTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("profiles/", include("profiles.urls")),
