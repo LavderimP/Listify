@@ -8,6 +8,7 @@ class CustomUserManager(UserManager):
         #     raise ValueError("Users must have an email address")
         # user = self.model(email=self.normalize_email(email), **extra_fields)
         user = self.model(**extra_fields)
+        user.is_active = True
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -30,8 +31,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=30, blank=True)
     # email = models.EmailField(unique=True)
     name = models.CharField(max_length=30, blank=True)
-    confirmation_code = models.CharField(max_length=4, blank=True)
-    code_expires = models.DateTimeField(blank=True, null=True)
+    # confirmation_code = models.CharField(max_length=4, blank=True)
+    # code_expires = models.DateTimeField(blank=True, null=True)
 
     USERNAME_FIELD = "username"
     # REQUIRED_FIELDS = ["email"]
