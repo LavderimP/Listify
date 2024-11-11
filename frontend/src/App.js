@@ -11,6 +11,7 @@ import List from "./components/List/List";
 import Detail from "./components/List/Detail";
 import NavBar from "./components/NavBar/NavBar";
 import Login from "./components/Login/Login";
+import Create from "./components/List/Create";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
@@ -20,6 +21,7 @@ function App() {
   const getTokensFromStorage = () => {
     const storedAccessToken = localStorage.getItem("accessToken");
     // const storedRefreshToken = localStorage.getItem("refreshToken");
+
     return {
       accessToken: storedAccessToken,
       // refreshToken: storedRefreshToken,
@@ -62,6 +64,7 @@ function App() {
             <NavBar onLogout={handleLogout} />
             <Routes>
               <Route path="/" element={<List accessToken={accessToken} />} />
+              <Route path="/add/" element={<Create />} />
               <Route path="/detail/:id" element={<Detail />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
