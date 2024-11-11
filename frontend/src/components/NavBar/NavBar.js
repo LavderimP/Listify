@@ -1,67 +1,69 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import "./NavBar.css";
-import { useNavigate } from "react-router-dom"; // Use useNavigate
 
 function NavBar({ onLogout }) {
   const navigate = useNavigate();
 
-  const handleListClick = () => {
-    navigate(`/`);
+  const handleFilterClick = (category) => {
+    navigate(`/?categories=${category}`);
   };
 
   const handleLogoutClick = () => {
-    // Call the onLogout function to clear tokens and perform any other necessary actions
     onLogout();
-    navigate("/"); // Optionally redirect to home after logout
+    navigate("/");
   };
 
   return (
     <div>
       <ul className="nav nav-tabs justify-content-between w-100">
-        {/* Profile */}
         <li className="nav-item">
           <a className="nav-link" href="/">
             Profile
           </a>
         </li>
-
-        {/* Right-aligned items */}
         <div className="d-flex align-items-center">
           <li className="nav-item">
-            <button className="nav-link" onClick={handleListClick}>
+            <button className="nav-link" onClick={() => navigate("/")}>
               <b>Lists</b>
             </button>
           </li>
-          {/* DropDown */}
           <li className="nav-item dropdown">
             <a
               className="nav-link dropdown-toggle"
               data-bs-toggle="dropdown"
               role="button"
               aria-expanded="false"
-              href="/"
             >
               Filter
             </a>
             <ul className="dropdown-menu">
               <li>
-                <a className="dropdown-item" href="/">
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleFilterClick("to-do")}
+                >
                   To-Do
-                </a>
+                </button>
               </li>
               <li>
-                <a className="dropdown-item" href="/">
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleFilterClick("task")}
+                >
                   Task
-                </a>
+                </button>
               </li>
               <li>
-                <a className="dropdown-item" href="/">
+                <button
+                  className="dropdown-item"
+                  onClick={() => handleFilterClick("shop")}
+                >
                   Shop
-                </a>
+                </button>
               </li>
             </ul>
           </li>
-          {/* LogOut */}
           <li className="nav-button">
             <button
               type="button"

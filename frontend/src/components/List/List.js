@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
+import Create from "./Create";
 import Delete from "./Delete";
 import "./List.css";
 import {
@@ -10,9 +11,11 @@ import {
 } from "react-icons/bs";
 
 function List({ accessToken }) {
+  console.log("List called");
   const [lists, setLists] = useState([]);
   const [fetching, setFetching] = useState(true); // State to manage fetching
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location
 
   const getCookie = (name) => {
     let cookieValue = null;
@@ -29,28 +32,35 @@ function List({ accessToken }) {
     return cookieValue;
   };
 
+  const csrftoken = getCookie("csrftoken");
+
+  const handleAddClick = () => {
+    navigate("/add/");
+  };
+
   const handleEditClick = (listId) => {
     navigate(`/detail/${listId}`);
   };
 
   const handleDeleteClick = (listId) => {
-    const csrftoken = getCookie("csrftoken");
-    Delete(listId, csrftoken, accessToken); // Pass accessToken to Delete function
-    setFetching(true); // Set fetching to true after delete
+    Delete(listId, csrftoken, accessToken);
+    setFetching(true);
   };
 
   const fetchLists = useCallback(() => {
-    const url = "http://127.0.0.1:8000/list/";
-    const csrftoken = getCookie("csrftoken");
+    const queryParams = new URLSearchParams(location.search); // Parse query parameters
+    const category = queryParams.get("categories"); // Get 'categories' from URL
+    const url = category
+      ? `http://127.0.0.1:8000/list/?categories=${category}`
+      : "http://127.0.0.1:8000/list/";
 
-    // Only send the Authorization header if accessToken is available
     const headers = {
       "Content-type": "application/json",
       "X-CSRFToken": csrftoken,
     };
 
     if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`; // Add Bearer token to headers
+      headers["Authorization"] = `Bearer ${accessToken}`;
     }
 
     fetch(url, {
@@ -65,7 +75,7 @@ function List({ accessToken }) {
       .catch((error) => {
         console.log("Error: ", error);
       });
-  }, [accessToken]); // Add accessToken as a dependency
+  }, [accessToken, location.search, csrftoken]); // Add dependencies
 
   useEffect(() => {
     if (fetching) {
@@ -77,12 +87,12 @@ function List({ accessToken }) {
     <div className="container">
       <h1>Lists</h1>
       <button
-        className="btn btn-primary "
+        className="btn btn-primary"
         style={{
-          border: "red solid",
           paddingTop: "5px",
           paddingBottom: "5px",
         }}
+        onClick={handleAddClick}
       >
         Add
       </button>
