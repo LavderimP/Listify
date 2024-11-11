@@ -8,6 +8,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
         token["username"] = user.username
         token["id"] = user.pk
+        token["picture"] = (
+            user.profiles.profile_picture.url
+            if hasattr(user, "profiles") and user.profiles.profile_picture
+            else None
+        )
+
         return token
 
 
