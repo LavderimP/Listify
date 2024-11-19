@@ -64,8 +64,14 @@ function App() {
             <NavBar onLogout={handleLogout} />
             <Routes>
               <Route path="/" element={<List accessToken={accessToken} />} />
-              <Route path="/add/" element={<Create />} />
-              <Route path="/detail/:id" element={<Detail />} />
+              <Route
+                path="/add/"
+                element={<Create accessToken={accessToken} />}
+              />
+              <Route
+                path="/list/:id/"
+                element={<Detail accessToken={accessToken} />}
+              />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </>

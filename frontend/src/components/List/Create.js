@@ -50,7 +50,7 @@ function Create({ csrftoken, accessToken }) {
 
   return (
     <div>
-      <h1>Create a New List</h1>
+      <h1 class="pt-2 text-center">Creating a New List</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label>
