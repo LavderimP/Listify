@@ -11,19 +11,15 @@ class ProfilesView(viewsets.ViewSet):
     # TODO Update the pk arg in retreive update and delete (delete needs to be deleted and made with password check)
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users access
 
-    def list(self, request):
-        queryset = Profiles.objects.all()
-        serializer = ProfilesSerializer(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def retrieve(self, request, pk=None):
-        profile = get_object_or_404(Profiles, profile_id=pk)
+    def retrieve(self, request):
+        user_id = request.user.id
+        profile = get_object_or_404(Profiles, user=user_id)
         serializer = ProfilesSerializer(profile)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def update(self, request, pk=None):
+    def update(self, request):
         user_id = request.user.id
-        profile = get_object_or_404(Profiles, profile_id=pk)
+        profile = get_object_or_404(Profiles, user=user_id)
 
         if user_id != profile.user.id:
             return Response(
@@ -37,11 +33,14 @@ class ProfilesView(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
+    def destroy(
+        self,
+        request,
+    ):
         user = request.user  # Get the authenticated user
 
         # Get the profile or return 404 if not found
-        profile = get_object_or_404(Profiles, profile_id=pk)
+        profile = get_object_or_404(Profiles, user=user.id)
 
         if profile.user.id != user.id:
             return Response(
