@@ -94,11 +94,7 @@ function List({ accessToken }) {
       <h1>Lists</h1>
       {/* Add button */}
       <button
-        className="btn btn-primary"
-        style={{
-          paddingTop: "5px",
-          paddingBottom: "5px",
-        }}
+        className="btn btn-primary pt-2 pb-2 mb-2"
         onClick={handleAddClick}
       >
         Add
