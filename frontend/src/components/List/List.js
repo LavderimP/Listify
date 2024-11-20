@@ -39,11 +39,11 @@ function List({ accessToken }) {
 
   // Handlers for navigation and actions
   const handleAddClick = () => {
-    navigate("/add/"); // Navigate to the add page
+    navigate("add/"); // Navigate to the add page
   };
 
   const handleEditClick = (listId) => {
-    navigate(`/list/${listId}`); // Navigate to the detail page for editing
+    navigate(`list/${listId}/`); // Navigate to the detail page for editing
   };
 
   const handleDeleteClick = (listId) => {

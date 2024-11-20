@@ -12,6 +12,7 @@ import Detail from "./components/List/Detail";
 import NavBar from "./components/NavBar/NavBar";
 import Login from "./components/Login/Login";
 import Create from "./components/List/Create";
+import ProfileDetail from "./components/Profile/ProfileDetail";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
@@ -63,13 +64,14 @@ function App() {
           <>
             <NavBar onLogout={handleLogout} />
             <Routes>
+              <Route path="profile/" element={<ProfileDetail />} />
               <Route path="/" element={<List accessToken={accessToken} />} />
               <Route
-                path="/add/"
+                path="add/"
                 element={<Create accessToken={accessToken} />}
               />
               <Route
-                path="/list/:id/"
+                path="list/:id/"
                 element={<Detail accessToken={accessToken} />}
               />
               <Route path="*" element={<Navigate to="/" />} />
