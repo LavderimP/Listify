@@ -11,7 +11,7 @@ function NavBar({ onLogout }) {
   };
 
   return (
-    <div>
+    <div className="navbar bg-dark">
       <ul className="nav nav-tabs justify-content-between w-100">
         <li className="nav-item">
           <a className="nav-link" href="profile/">

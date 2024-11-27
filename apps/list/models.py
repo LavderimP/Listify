@@ -33,15 +33,15 @@ class List(models.Model):
 
     def save(self, *args, **kwargs):
 
-        if self.private:
-            if len(self.private_pass) < 4:
-                raise ValidationError("Password needs to be 4 or more characters.")
+        # if self.private:
+        #     if len(self.private_pass) < 4:
+        #         raise ValidationError("Password needs to be 4 or more characters.")
 
-            if self.private_pass is None:
-                raise ValidationError(
-                    "Can not created a private list without a password"
-                )
-            self.private_pass = make_password(self.private_pass)
+        #     if self.private_pass is None:
+        #         raise ValidationError(
+        #             "Can not created a private list without a password"
+        #         )
+        #     self.private_pass = make_password(self.private_pass)
 
         super(List, self).save(*args, **kwargs)
 

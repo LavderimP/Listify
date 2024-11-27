@@ -29,6 +29,24 @@ function App() {
     };
   };
 
+  // Function to get CSRF token from cookies (for secure requests)
+  const getCookie = (name) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === name + "=") {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  };
+
+  const csrftoken = getCookie("csrftoken");
+
   // Callback function to set the token when login is successful
   const handleLogin = (token, refresh) => {
     setAccessToken(token);
@@ -64,15 +82,27 @@ function App() {
           <>
             <NavBar onLogout={handleLogout} />
             <Routes>
-              <Route path="profile/" element={<ProfileDetail />} />
+              <Route
+                path="profile/"
+                element={
+                  <ProfileDetail
+                    csrftoken={csrftoken}
+                    accessToken={accessToken}
+                  />
+                }
+              />
               <Route path="/" element={<List accessToken={accessToken} />} />
               <Route
                 path="add/"
-                element={<Create accessToken={accessToken} />}
+                element={
+                  <Create csrftoken={csrftoken} accessToken={accessToken} />
+                }
               />
               <Route
                 path="list/:id/"
-                element={<Detail accessToken={accessToken} />}
+                element={
+                  <Detail csrftoken={csrftoken} accessToken={accessToken} />
+                }
               />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>

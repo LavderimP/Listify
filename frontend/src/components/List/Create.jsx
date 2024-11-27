@@ -8,6 +8,7 @@ function Create({ csrftoken, accessToken }) {
     private: false,
     text: "",
   });
+  const listID = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -43,6 +44,7 @@ function Create({ csrftoken, accessToken }) {
           text: "",
         }); // Reset form
       })
+      // .then(data=> )
       .catch((error) => {
         console.error("Error:", error);
       });
