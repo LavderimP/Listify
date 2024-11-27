@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
-import Create from "./Create";
+import { useNavigate, useLocation } from "react-router-dom"; // Hooks for navigation and URL management
 import Delete from "./Delete";
 import "./List.css";
 import {
@@ -8,94 +7,82 @@ import {
   BsLockFill,
   BsFillPencilFill,
   BsFillTrash3Fill,
-} from "react-icons/bs";
+} from "react-icons/bs"; // Importing icons for UI
 
-function List({ accessToken }) {
-  console.log("List called");
+function List({ csrftoken, accessToken }) {
+  console.log("List component rendered");
+
+  // State to hold fetched lists and loading state
   const [lists, setLists] = useState([]);
-  const [fetching, setFetching] = useState(true); // State to manage fetching
-  const navigate = useNavigate();
-  const location = useLocation(); // Get the current location
+  const [fetching, setFetching] = useState(true);
 
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  };
+  const navigate = useNavigate(); // For programmatic navigation
+  const location = useLocation(); // To get current URL and query parameters
 
-  const csrftoken = getCookie("csrftoken");
-
+  // Handlers for navigation and actions
   const handleAddClick = () => {
-    navigate("/add/");
+    navigate("add/"); // Navigate to the add page
   };
 
   const handleEditClick = (listId) => {
-    navigate(`/detail/${listId}`);
+    navigate(`list/${listId}/`); // Navigate to the detail page for editing
   };
 
   const handleDeleteClick = (listId) => {
-    Delete(listId, csrftoken, accessToken);
-    setFetching(true);
+    Delete(listId, csrftoken, accessToken); // Call delete function
+    setFetching(true); // Trigger a re-fetch after deletion
   };
 
+  // Function to fetch lists from the API, filtered by category if applicable
   const fetchLists = useCallback(() => {
     const queryParams = new URLSearchParams(location.search); // Parse query parameters
-    const category = queryParams.get("categories"); // Get 'categories' from URL
+    const category = queryParams.get("categories"); // Get 'categories' parameter
     const url = category
       ? `http://127.0.0.1:8000/list/?categories=${category}`
-      : "http://127.0.0.1:8000/list/";
+      : "http://127.0.0.1:8000/list/"; // Decide URL based on category presence
 
     const headers = {
-      "Content-type": "application/json",
-      "X-CSRFToken": csrftoken,
+      "Content-Type": "application/json", // API expects JSON
+      "X-CSRFToken": csrftoken, // Include CSRF token
     };
 
     if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`;
+      headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
     }
 
-    fetch(url, {
-      method: "GET",
-      headers: headers,
-    })
-      .then((response) => response.json())
+    fetch(url, { method: "GET", headers })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch data.");
+        return response.json(); // Parse response as JSON
+      })
       .then((data) => {
-        setLists(data);
-        setFetching(false); // Stop fetching when data is retrieved
+        setLists(data); // Update state with fetched lists
+        setFetching(false); // Stop fetching
       })
       .catch((error) => {
-        console.log("Error: ", error);
+        console.error("Error fetching lists:", error); // Log any errors
       });
-  }, [accessToken, location.search, csrftoken]); // Add dependencies
+  }, [accessToken, location.search, csrftoken]); // Dependencies: re-run when these change
 
+  // useEffect to trigger fetchLists when 'fetching' changes
   useEffect(() => {
     if (fetching) {
-      fetchLists();
+      fetchLists(); // Fetch lists when the component mounts or fetching is true
     }
-  }, [fetching, fetchLists]); // Add fetchLists to dependencies
+  }, [fetching, fetchLists]);
 
   return (
     <div className="container">
       <h1>Lists</h1>
+      {/* Add button */}
       <button
-        className="btn btn-primary"
-        style={{
-          paddingTop: "5px",
-          paddingBottom: "5px",
-        }}
+        className="btn btn-primary pt-2 pb-2 mb-2"
         onClick={handleAddClick}
       >
         Add
       </button>
+
+      {/* Display list items */}
       <div className="list-wrapper">
         {lists.map((list) => (
           <div key={list.list_id} className="task-wrapper">
@@ -119,7 +106,10 @@ function List({ accessToken }) {
                 />
               )}
             </p>
+            {/* Display text if the item is not private */}
             {!list.private && <p>Text: {list.text}</p>}
+
+            {/* Buttons for editing and deleting */}
             <div className="button-container">
               <button
                 className="btn btn-sm btn-outline-info"

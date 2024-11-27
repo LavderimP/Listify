@@ -8,6 +8,7 @@ function Create({ csrftoken, accessToken }) {
     private: false,
     text: "",
   });
+  const listID = useState("");
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -43,6 +44,7 @@ function Create({ csrftoken, accessToken }) {
           text: "",
         }); // Reset form
       })
+      // .then(data=> )
       .catch((error) => {
         console.error("Error:", error);
       });
@@ -50,7 +52,7 @@ function Create({ csrftoken, accessToken }) {
 
   return (
     <div>
-      <h1>Create a New List</h1>
+      <h1 class="pt-2 text-center">Creating a New List</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label>

@@ -5,28 +5,24 @@ import "./NavBar.css";
 function NavBar({ onLogout }) {
   const navigate = useNavigate();
 
-  const handleFilterClick = (category) => {
-    navigate(`/?categories=${category}`);
-  };
-
   const handleLogoutClick = () => {
     onLogout();
     navigate("/");
   };
 
   return (
-    <div>
+    <div className="navbar bg-dark">
       <ul className="nav nav-tabs justify-content-between w-100">
         <li className="nav-item">
-          <a className="nav-link" href="/">
+          <a className="nav-link" href="profile/">
             Profile
           </a>
         </li>
         <div className="d-flex align-items-center">
           <li className="nav-item">
-            <button className="nav-link" onClick={() => navigate("/")}>
-              <b>Lists</b>
-            </button>
+            <a className="nav-link" href="/">
+              Lists
+            </a>
           </li>
           <li className="nav-item dropdown">
             <a
@@ -39,28 +35,22 @@ function NavBar({ onLogout }) {
             </a>
             <ul className="dropdown-menu">
               <li>
-                <button
-                  className="dropdown-item"
-                  onClick={() => handleFilterClick("to-do")}
+                <a
+                  className="nav-link text-secondary"
+                  href="/?categories=to-do"
                 >
                   To-Do
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  className="dropdown-item"
-                  onClick={() => handleFilterClick("task")}
-                >
+                <a className="nav-link text-secondary" href="/?categories=task">
                   Task
-                </button>
+                </a>
               </li>
               <li>
-                <button
-                  className="dropdown-item"
-                  onClick={() => handleFilterClick("shop")}
-                >
+                <a className="nav-link text-secondary" href="/?categories=shop">
                   Shop
-                </button>
+                </a>
               </li>
             </ul>
           </li>

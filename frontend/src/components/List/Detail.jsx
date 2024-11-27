@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"; // Import useParams
 import { BsFillUnlockFill, BsLockFill } from "react-icons/bs"; // Import icons
 import "./Detail.css";
 
-function Detail({ onUpdate, accessToken }) {
+function Detail({ onUpdate, csrftoken, accessToken }) {
   const { id } = useParams(); // Get the ID from the URL
   const [listData, setListData] = useState({
     title: "",
@@ -12,25 +12,9 @@ function Detail({ onUpdate, accessToken }) {
     private: false,
   });
 
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  };
-
   useEffect(() => {
     const fetchListDetails = async () => {
       const url = `http://127.0.0.1:8000/list/${id}/`;
-      const csrftoken = getCookie("csrftoken");
 
       try {
         const response = await fetch(url, {
@@ -61,7 +45,6 @@ function Detail({ onUpdate, accessToken }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const csrftoken = getCookie("csrftoken");
 
     fetch(`http://127.0.0.1:8000/list/${id}/`, {
       method: "PUT", // Assuming your API supports PUT for updates
