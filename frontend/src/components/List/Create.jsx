@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Create({ csrftoken, accessToken }) {
   const url = "http://127.0.0.1:8000/list/add/";
@@ -8,7 +9,7 @@ function Create({ csrftoken, accessToken }) {
     private: false,
     text: "",
   });
-  const listID = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -44,7 +45,7 @@ function Create({ csrftoken, accessToken }) {
           text: "",
         }); // Reset form
       })
-      // .then(data=> )
+      .then(navigate("/"))
       .catch((error) => {
         console.error("Error:", error);
       });
