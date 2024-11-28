@@ -45,8 +45,8 @@ function ProfileDetail({ csrftoken, accessToken }) {
 
   return (
     <div>
-      <h2>Profile Details</h2>
       <form>
+        <h2>Profile Details</h2>
         <div className="form-div">
           <label>Picture:</label>
           <img
@@ -110,6 +110,9 @@ function ProfileDetail({ csrftoken, accessToken }) {
               setProfileData({ ...profileData, link: e.target.value })
             }
           />
+        </div>
+        <div className="form-btn">
+          <button className="btn btn-primary pt-2 pb-2 mb-2">Save</button>
         </div>
       </form>
     </div>
