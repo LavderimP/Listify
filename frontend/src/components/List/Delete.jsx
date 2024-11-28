@@ -1,7 +1,7 @@
 function Delete(index, csrftoken, accessToken) {
   const url = `http://127.0.0.1:8000/list/${index}/`;
 
-  fetch(url, {
+  return fetch(url, {
     method: "DELETE",
     headers: {
       "Content-type": "application/json",
@@ -14,15 +14,11 @@ function Delete(index, csrftoken, accessToken) {
         console.log(`List ${index} deleted successfully!`);
         return null; // No content to parse as JSON
       }
-      return response.json(); // Handle other response statuses
-    })
-    .then((data) => {
-      if (data) {
-        console.log("Data:", data);
-      }
+      throw new Error("Failed to delete the list"); // Handle other response statuses
     })
     .catch((error) => {
       console.log("Error:", error);
+      throw error; // Propagate error so we can handle it in the calling function
     });
 }
 

@@ -11,7 +11,9 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
     text: "",
     private: false,
   });
+  const [gotUpdated, setGotUpdated] = useState(false);
 
+  // Fetch the list details when the component is mounted or when `id` or `accessToken` changes
   useEffect(() => {
     const fetchListDetails = async () => {
       const url = `http://127.0.0.1:8000/list/${id}/`;
@@ -33,8 +35,9 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
     };
 
     fetchListDetails();
-  }, [id, accessToken]); // Add accessToken to the dependency array
+  }, [id, accessToken, csrftoken]); // Add accessToken and csrftoken to dependencies to refetch data if they change
 
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setListData((prevData) => ({
@@ -43,6 +46,7 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
     }));
   };
 
+  // Handle form submission for updating the list
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -57,7 +61,9 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
     })
       .then((response) => response.json())
       .then((data) => {
-        onUpdate(data); // Call onUpdate to update parent component
+        onUpdate(data); // Call onUpdate to notify the parent component
+        setGotUpdated(true); // Show the "List Updated" message
+        setTimeout(() => setGotUpdated(false), 3000); // Hide the "List Updated" message after 3 seconds
       })
       .catch((error) => {
         console.log("Error:", error);
@@ -67,6 +73,8 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
   return (
     <form onSubmit={handleSubmit}>
       <h2>Edit List</h2>
+      {gotUpdated && <p>List Updated</p>}{" "}
+      {/* Conditionally render the "List Updated" message */}
       <div>
         <label>
           Title:
