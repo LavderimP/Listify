@@ -29,8 +29,13 @@ function List({ csrftoken, accessToken }) {
   };
 
   const handleDeleteClick = (listId) => {
-    Delete(listId, csrftoken, accessToken); // Call delete function
-    setFetching(true); // Trigger a re-fetch after deletion
+    Delete(listId, csrftoken, accessToken)
+      .then(() => {
+        setFetching(true); // Trigger a re-fetch after deletion
+      })
+      .catch((error) => {
+        console.error("Error deleting list:", error); // Log if delete fails
+      });
   };
 
   // Function to fetch lists from the API, filtered by category if applicable

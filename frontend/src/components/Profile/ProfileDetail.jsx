@@ -52,7 +52,12 @@ function ProfileDetail({ csrftoken, accessToken }) {
           <img
             src={profileData.profile_picture || ""}
             alt="Profile"
-            style={{ width: "150px", height: "150px", objectFit: "cover" }}
+            style={{
+              width: "150px",
+              height: "150px",
+              objectFit: "cover",
+              borderRadius: "50%",
+            }}
           />
           {/* // ! To add change button */}
         </div>
