@@ -25,14 +25,16 @@ class ListViewSet(viewsets.ViewSet):
         if user_profile is None:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
+        # TODO: Add the status
+        preferred_status = user_profile.preferred_status
         categories = request.query_params.get("categories")
 
         if categories is None:
-            queryset = List.objects.filter(profile=user_profile).order_by("created_at")
+            queryset = List.objects.filter(profile=user_profile)
         else:
-            queryset = List.objects.filter(
-                profile=user_profile, categories=categories
-            ).order_by("created_at")
+            queryset = List.objects.filter(profile=user_profile, categories=categories)
+
+        queryset = queryset.order_by("created_at")
 
         # Use ListSerializer for list view to hide private content
         serializer = ListSerializer(queryset, many=True)

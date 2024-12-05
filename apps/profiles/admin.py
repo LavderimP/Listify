@@ -7,14 +7,11 @@ class ProfilesManager(admin.ModelAdmin):
     list_display = (
         "profile_id",
         "user",
-        "username",
-        "bio",
-        "link",
         "created_at",
         "updated_at",
     )
-    list_filter = ("created_at", "updated_at")
-    search_fields = ("user", "username", "bio", "link")
+    list_filter = ("created_at", "updated_at", "profile_id", "user")
+    search_fields = ("profile_id", "user")
     ordering = ("created_at", "updated_at")
 
 

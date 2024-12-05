@@ -10,12 +10,27 @@ class ListManager(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "title",
-        "private",
         "categories",
+        "list_status",
         "text",
+        "private",
     )
-    list_filter = ("profile", "created_at", "updated_at")
-    search_fields = ("list_id", "profile", "created_at", "updated_at", "title")
+    list_filter = (
+        "profile",
+        "created_at",
+        "updated_at",
+        "categories",
+        "list_status",
+    )
+    search_fields = (
+        "list_id",
+        "profile",
+        "created_at",
+        "updated_at",
+        "title",
+        "categories",
+        "list_status",
+    )
 
 
 admin.site.register(List, ListManager)
