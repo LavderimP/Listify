@@ -16,13 +16,24 @@ class List(models.Model):
 
     # * Fields
     title = models.TextField(max_length=30)
-    STATUS_CHOICES = [
+    CATEGORY_CHOICES = [
         ("to-do", "To-Do"),
         ("task", "Task"),
         ("shop", "Shop"),
     ]
     categories = models.CharField(
-        max_length=10, choices=STATUS_CHOICES, null=True, blank=True
+        max_length=10, choices=CATEGORY_CHOICES, null=True, blank=True
+    )
+    STATUS_CHOICES = [
+        ("completed", "Completed"),
+        ("progress", "On Progress"),
+    ]
+    list_status = models.CharField(
+        default="progress",
+        max_length=10,
+        choices=STATUS_CHOICES,
+        null=True,
+        blank=True,
     )
     text = models.TextField(max_length=500, null=True, blank=True)
     private = models.BooleanField(default=False, null=True, blank=True)

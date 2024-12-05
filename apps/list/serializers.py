@@ -1,22 +1,5 @@
 from .models import List, ListPictures
 from rest_framework import serializers
-from profiles.models import Profiles
-
-
-class ProfilesSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profiles
-        fields = [
-            "created_at",
-            "profile_id",
-            "username",
-        ]
-
-    def to_representation(self, instance):
-        self.fields["created_at"] = serializers.DateTimeField(
-            format="%Y-%m-%d %H:%M:%S"
-        )
-        return super().to_representation(instance)
 
 
 class ListPicturesSerializer(serializers.ModelSerializer):
@@ -35,24 +18,24 @@ class ListSerializer(serializers.ModelSerializer):
     class Meta:
         model = List
         fields = [
-            "list_id",
             "created_at",
             "updated_at",
+            "list_id",
             "title",
             "pictures",
             "categories",
+            "list_status",
             "text",
             "private",
         ]
         extra_kwargs = {
-            "profile": {"required": False},
             "private_pass": {"required": False},
         }
 
-    def create(self, validated_data):
-        profile = validated_data.pop("profile", None)
-        list_instance = List.objects.create(profile=profile, **validated_data)
-        return list_instance
+    # def create(self, validated_data):
+    #     profile = validated_data.pop("profile", None)
+    #     list_instance = List.objects.create(profile=profile, **validated_data)
+    #     return list_instance
 
     def to_representation(self, instance):
         if instance.private:
@@ -70,7 +53,6 @@ class ListSerializer(serializers.ModelSerializer):
         self.fields["updated_at"] = serializers.DateTimeField(
             format="%Y-%m-%d %H:%M:%S"
         )
-        self.fields["profile"] = ProfilesSerializer()
         self.fields["pictures"] = ListPicturesSerializer(many=True)
         return super().to_representation(instance)
 
@@ -88,6 +70,5 @@ class ListDetailSerializer(ListSerializer):
         self.fields["updated_at"] = serializers.DateTimeField(
             format="%Y-%m-%d %H:%M:%S"
         )
-        self.fields["profile"] = ProfilesSerializer()
         self.fields["pictures"] = ListPicturesSerializer(many=True)
         return super(ListSerializer, self).to_representation(instance)

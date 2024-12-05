@@ -2,13 +2,13 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.urls import reverse
-
-
 from user.models import User
 
 
 # * Profile Model
 class Profiles(models.Model):
+    """Core Fields"""
+
     # * User
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True)
 
@@ -21,9 +21,20 @@ class Profiles(models.Model):
     profile_picture = models.ImageField(
         upload_to="profile_pictures/", blank=True, null=True
     )
-    username = models.CharField(max_length=30, blank=True)
-    bio = models.TextField(blank=True, null=True)
-    link = models.URLField(blank=True, null=True)
+
+    """App-Specific Fields"""
+
+    STATUS_CHOICES = [
+        ("completed", "Completed"),
+        ("progress", "On Progress"),
+    ]
+    preferred_status = models.CharField(
+        default="progress",
+        max_length=10,
+        choices=STATUS_CHOICES,
+        null=True,
+        blank=True,
+    )
 
     def __str__(self):
         return str(self.profile_id)
@@ -34,7 +45,7 @@ class Profiles(models.Model):
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
         if created:
-            profile = Profiles.objects.create(user=instance, username=instance.username)
+            profile = Profiles.objects.create(user=instance)
             profile.save()
             print("Profile created")
 
