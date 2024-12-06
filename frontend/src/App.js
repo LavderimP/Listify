@@ -10,7 +10,7 @@ import {
 import List from "./components/List/List";
 import Detail from "./components/List/Detail";
 import NavBar from "./components/NavBar/NavBar";
-import Login from "./components/Login/Login";
+import Signin from "./components/userAuth/Signin";
 import Create from "./components/List/Create";
 import ProfileDetail from "./components/Profile/ProfileDetail";
 
@@ -42,16 +42,16 @@ function App() {
 
   const csrftoken = getCookie("csrftoken");
 
-  // Callback function to set the token when login is successful
-  const handleLogin = (token) => {
+  // Callback function to set the token when sign in  is successful
+  const handleSignin = (token) => {
     setAccessToken(token);
     localStorage.setItem("accessToken", token);
   };
 
-  // Function to clear the tokens (for logout)
-  const handleLogout = () => {
+  // Function to clear the tokens (for sign out)
+  const handleSignout = () => {
     setAccessToken(null);
-    localStorage.removeItem("accessToken");
+    localStorage.clear();
   };
 
   useEffect(() => {
@@ -70,10 +70,10 @@ function App() {
     <div>
       <Router>
         {!accessToken ? (
-          <Login onLogin={handleLogin} />
+          <Signin onLogin={handleSignin} accessToken={accessToken} />
         ) : (
           <>
-            <NavBar onLogout={handleLogout} accessToken={accessToken} />
+            <NavBar onLogout={handleSignout} accessToken={accessToken} />
             <Routes>
               <Route
                 path="profile/"
