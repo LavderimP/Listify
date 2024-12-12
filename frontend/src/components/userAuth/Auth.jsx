@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import Logo from "../../assets/Logo.png";
 import Image1 from "../../assets/Image1.png";
-import "./Signin.css";
+import "./Auth.css";
 
 function Signin({ csrftoken, onLogin }) {
   const [activeItem, setActiveItem] = useState({
     username: "",
     fullname: "",
-    password1: "",
-    password2: "",
+    password: "",
+    password_confirm: "",
   });
   const [side, setSide] = useState(false);
   const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ function Signin({ csrftoken, onLogin }) {
     }));
   };
 
-  const loginApiCall = () => {
+  const signinApiCall = () => {
     const url = "http://127.0.0.1:8000/login/";
 
     fetch(url, {
@@ -55,9 +55,52 @@ function Signin({ csrftoken, onLogin }) {
       });
   };
 
+  const signupApiCall = () => {
+    const url = "http://127.0.0.1:8000/register/";
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify(activeItem),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((errorData) => {
+            throw new Error(
+              errorData.detail || "Register failed. Please try again."
+            );
+          });
+        }
+        return response.json();
+      })
+      .then(() => signinApiCall()) // Pass signinApiCall as a callback function
+      .then(() => {
+        setActiveItem({
+          username: "",
+          fullname: "",
+          password1: "",
+          password2: "",
+        });
+      })
+      .catch((error) => {
+        setError(error.message);
+        console.error("Error:", error);
+      });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    loginApiCall();
+
+    const buttonClass = e.target.className;
+
+    if (buttonClass.includes("signin-button")) {
+      signinApiCall();
+    } else if (buttonClass.includes("signup-button")) {
+      signupApiCall();
+    }
   };
 
   const handleButtonClick = (e) => {
@@ -101,7 +144,7 @@ function Signin({ csrftoken, onLogin }) {
               </p>
             )}
             <button
-              className="sign-button"
+              className="signin-button"
               type="submit"
               onClick={handleSubmit}
             >
@@ -132,19 +175,19 @@ function Signin({ csrftoken, onLogin }) {
             />
             <input
               className="password-input"
-              name="password1"
+              name="password"
               type="password"
               placeholder="Password"
               onChange={handleChange}
-              value={activeItem.password1}
+              value={activeItem.password}
             />
             <input
               className="password-input"
-              name="password2"
+              name="password_confirm"
               type="password"
               placeholder="Confirm Password"
               onChange={handleChange}
-              value={activeItem.password2}
+              value={activeItem.password_confirm}
             />
             {error && (
               <p className="error" style={{ color: "red" }}>
@@ -152,7 +195,7 @@ function Signin({ csrftoken, onLogin }) {
               </p>
             )}
             <button
-              className="sign-button"
+              className="signup-button"
               type="submit"
               onClick={handleSubmit}
             >

@@ -36,8 +36,7 @@ function Create({ csrftoken, accessToken }) {
         }
         return response.json();
       })
-      .then((data) => {
-        console.log("Success:", data);
+      .then(() => {
         setListData({
           title: "",
           categories: "to-do",

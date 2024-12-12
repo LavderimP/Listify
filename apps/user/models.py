@@ -24,13 +24,14 @@ class CustomUserManager(UserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     # User model
+    # ! Error when user is being created is_active isn't becoming True
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     objects = CustomUserManager()
     # Personal info
     username = models.CharField(unique=True, max_length=30, blank=True)
     # email = models.EmailField(unique=True)
-    name = models.CharField(max_length=30, blank=True)
+    fullname = models.CharField(max_length=30, blank=True)
     # confirmation_code = models.CharField(max_length=4, blank=True)
     # code_expires = models.DateTimeField(blank=True, null=True)
 
@@ -38,7 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # REQUIRED_FIELDS = ["email"]
 
     def get_full_name(self):
-        return self.name
+        return self.fullname
 
     def get_short_name(self):
         return self.username
