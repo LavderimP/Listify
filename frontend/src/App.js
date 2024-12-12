@@ -10,7 +10,7 @@ import {
 import List from "./components/List/List";
 import Detail from "./components/List/Detail";
 import NavBar from "./components/NavBar/NavBar";
-import Signin from "./components/userAuth/Signin";
+import Auth from "./components/userAuth/Auth";
 import Create from "./components/List/Create";
 import ProfileDetail from "./components/Profile/ProfileDetail";
 
@@ -70,7 +70,7 @@ function App() {
     <div>
       <Router>
         {!accessToken ? (
-          <Signin onLogin={handleSignin} accessToken={accessToken} />
+          <Auth onLogin={handleSignin} accessToken={accessToken} />
         ) : (
           <>
             <NavBar onLogout={handleSignout} accessToken={accessToken} />

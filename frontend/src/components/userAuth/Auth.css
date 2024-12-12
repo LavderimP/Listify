@@ -61,7 +61,7 @@
     margin-top: 8%;
   }
 
-  && .sign-button {
+  && button {
     background-color: #172a39;
     width: 500px;
     border-radius: 25px;
