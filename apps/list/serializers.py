@@ -23,8 +23,10 @@ class ListSerializer(serializers.ModelSerializer):
             "list_id",
             "title",
             "pictures",
-            "categories",
+            "category",
             "list_status",
+            "reminder",
+            "pined",
             "text",
             "private",
         ]
@@ -43,7 +45,9 @@ class ListSerializer(serializers.ModelSerializer):
             return {
                 "list_id": instance.list_id,
                 "title": instance.title,
-                "categories": instance.categories,
+                "category": instance.category,
+                "reminder": instance.reminder,
+                "pined": instance.pined,
                 "private": instance.private,
             }
 

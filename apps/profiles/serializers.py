@@ -6,7 +6,7 @@ from user.models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "name", "username"]
+        fields = ["id", "fullname", "username"]
 
 
 class ProfilesSerializer(serializers.ModelSerializer):
@@ -16,8 +16,6 @@ class ProfilesSerializer(serializers.ModelSerializer):
             "user",
             "profile_id",
             "profile_picture",
-            "bio",
-            "link",
         ]
 
     def to_representation(self, instance):

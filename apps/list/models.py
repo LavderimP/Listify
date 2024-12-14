@@ -21,7 +21,7 @@ class List(models.Model):
         ("task", "Task"),
         ("shop", "Shop"),
     ]
-    categories = models.CharField(
+    category = models.CharField(
         max_length=10, choices=CATEGORY_CHOICES, null=True, blank=True
     )
     STATUS_CHOICES = [
@@ -35,6 +35,8 @@ class List(models.Model):
         null=True,
         blank=True,
     )
+    pined = models.BooleanField(default=False, null=True, blank=True)
+    reminder = models.DateTimeField(null=True, blank=True)
     text = models.TextField(max_length=500, null=True, blank=True)
     private = models.BooleanField(default=False, null=True, blank=True)
     private_pass = models.CharField(max_length=100, null=True, blank=True)
