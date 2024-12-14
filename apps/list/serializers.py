@@ -27,8 +27,8 @@ class ListSerializer(serializers.ModelSerializer):
             "list_status",
             "reminder",
             "pined",
-            "text",
             "private",
+            "text",
         ]
         extra_kwargs = {
             "private_pass": {"required": False},
@@ -40,16 +40,19 @@ class ListSerializer(serializers.ModelSerializer):
     #     return list_instance
 
     def to_representation(self, instance):
-        if instance.private:
-            # Return only limited info for private lists in list view
-            return {
-                "list_id": instance.list_id,
-                "title": instance.title,
-                "category": instance.category,
-                "reminder": instance.reminder,
-                "pined": instance.pined,
-                "private": instance.private,
-            }
+
+        list = self.context.get("list")
+        if list:
+            if instance.private:
+                # Return only limited info for private lists in list view
+                return {
+                    "list_id": instance.list_id,
+                    "title": instance.title,
+                    "category": instance.category,
+                    "reminder": instance.reminder,
+                    "pined": instance.pined,
+                    "private": instance.private,
+                }
 
         self.fields["created_at"] = serializers.DateTimeField(
             format="%Y-%m-%d %H:%M:%S"
@@ -59,20 +62,3 @@ class ListSerializer(serializers.ModelSerializer):
         )
         self.fields["pictures"] = ListPicturesSerializer(many=True)
         return super().to_representation(instance)
-
-
-class ListDetailSerializer(ListSerializer):
-    class Meta(ListSerializer.Meta):
-        model = List
-        fields = ListSerializer.Meta.fields
-
-    def to_representation(self, instance):
-        # Always show full content regardless of private status
-        self.fields["created_at"] = serializers.DateTimeField(
-            format="%Y-%m-%d %H:%M:%S"
-        )
-        self.fields["updated_at"] = serializers.DateTimeField(
-            format="%Y-%m-%d %H:%M:%S"
-        )
-        self.fields["pictures"] = ListPicturesSerializer(many=True)
-        return super(ListSerializer, self).to_representation(instance)
