@@ -109,8 +109,8 @@ function Signin({ csrftoken, onLogin }) {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-images-container">
+    <div className="auth-container">
+      <div className="auth-images-container">
         <div className="logo-container">
           <img id="logo-img" src={Logo} alt="Logo here" />
         </div>
@@ -118,7 +118,7 @@ function Signin({ csrftoken, onLogin }) {
           <img id="photo-img" src={Image1} alt="Photo here" />
         </div>
       </div>
-      <div className="login-form-container">
+      <div className="auth-form-container">
         {!side ? (
           <>
             <h1>Sign In</h1>
