@@ -73,6 +73,20 @@ class ListViewSet(viewsets.ViewSet):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def pin(self, request, pk=None):
+        user_profile = request.user
+
+        if user_profile is None:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
+
+        queryset = get_object_or_404(List, list_id=pk)
+
+        # Toggle the pined status
+        queryset.pined = not queryset.pined
+        queryset.save()
+
+        return Response(status=status.HTTP_200_OK)
+
     def update(self, request, pk=None):
 
         user_profile = request.user

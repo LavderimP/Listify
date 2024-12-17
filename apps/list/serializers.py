@@ -31,6 +31,8 @@ class ListSerializer(serializers.ModelSerializer):
             "text",
         ]
         extra_kwargs = {
+            "created_at": {"format": "%Y-%m-%d %H:%M:%S"},
+            "updated_at": {"format": "%Y-%m-%d %H:%M:%S"},
             "private_pass": {"required": False},
         }
 
@@ -41,24 +43,20 @@ class ListSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
 
-        list = self.context.get("list")
-        if list:
-            if instance.private:
-                # Return only limited info for private lists in list view
-                return {
-                    "list_id": instance.list_id,
-                    "title": instance.title,
-                    "category": instance.category,
-                    "reminder": instance.reminder,
-                    "pined": instance.pined,
-                    "private": instance.private,
-                }
-
-        self.fields["created_at"] = serializers.DateTimeField(
-            format="%Y-%m-%d %H:%M:%S"
-        )
-        self.fields["updated_at"] = serializers.DateTimeField(
-            format="%Y-%m-%d %H:%M:%S"
-        )
         self.fields["pictures"] = ListPicturesSerializer(many=True)
+
+        list = self.context.get("list")
+
+        if list and instance.private:
+            # Return only limited info for private lists in list view
+            return {
+                "created_at": instance.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "list_id": instance.list_id,
+                "title": instance.title,
+                "category": instance.category,
+                "reminder": instance.reminder,
+                "pined": instance.pined,
+                "private": instance.private,
+            }
+
         return super().to_representation(instance)

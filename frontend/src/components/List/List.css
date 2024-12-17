@@ -1,18 +1,58 @@
-.container {
-  padding: 20px;
+body {
+  background-color: #d9d9d9;
+}
+
+.header-container {
+  text-align: center;
+  padding: 10px 0;
+  && input {
+    margin: 0 24%;
+    width: 600px;
+    border-radius: 25px;
+  }
+}
+
+h1 {
+  margin-left: 15%;
+  color: #172a39;
+}
+
+p:hover {
+  color: #e95a44;
+}
+
+.icon {
+  color: #e95a44;
+  font-size: 1em;
+}
+
+.pin-icon {
+  font-size: 2em;
+}
+
+.content-container {
+  display: flex;
+}
+
+.side-bar {
+  width: 10%;
+  padding-left: 3%;
+  color: #172a39;
+  font-size: 20px;
+}
+
+.list-map {
+  width: 90%;
+  color: white;
+  display: grid;
+  margin: 20px 6% 0px;
+  padding: 10px 0px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
 }
 
 .list-wrapper {
-  display: flex; /* Use flexbox */
-  flex-wrap: wrap; /* Allow items to wrap to the next line if necessary */
-  gap: 10px; /* Space between items */
-}
-
-.task-wrapper {
-  background-color: #f0f0f0; /* Background color for each task */
-  padding: 10px; /* Padding inside each task */
-  border: 1px solid #ccc; /* Optional border */
-  border-radius: 5px; /* Optional rounded corners */
-  flex: 1 1 calc(33% - 10px); /* Flex-grow, flex-shrink, and basis for responsive layout */
-  box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+  border-radius: 25px;
+  padding: 10px; /* Padding inside each list item */
+  background-color: #707579; /* Darker background for better visibility */
 }
