@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-function ProfileDetail({ csrftoken, accessToken }) {
+function ProfileDetail({ csrftoken, onLogout, accessToken }) {
   const [profileData, setProfileData] = useState({
     user: {
       id: "",
@@ -12,6 +13,12 @@ function ProfileDetail({ csrftoken, accessToken }) {
     bio: "",
     link: "",
   });
+  const navigate = useNavigate();
+
+  const handleLogoutClick = () => {
+    onLogout();
+    navigate("/");
+  };
 
   useEffect(() => {
     const url = "http://127.0.0.1:8000/profiles/";
@@ -89,31 +96,17 @@ function ProfileDetail({ csrftoken, accessToken }) {
             }
           />
         </div>
-        <div className="form-div">
-          <label>Bio:</label>
-          <input
-            type="text"
-            placeholder="Bio"
-            value={profileData.bio || ""}
-            onChange={(e) =>
-              setProfileData({ ...profileData, bio: e.target.value })
-            }
-          />
-        </div>
-        <div className="form-div">
-          <label>Link:</label>
-          <input
-            type="text"
-            placeholder="Link"
-            value={profileData.link || ""}
-            onChange={(e) =>
-              setProfileData({ ...profileData, link: e.target.value })
-            }
-          />
-        </div>
+
         <div className="form-btn">
           <button className="btn btn-primary pt-2 pb-2 mb-2">Save</button>
         </div>
+        <button
+          type="button"
+          className="logout-btn"
+          onClick={handleLogoutClick}
+        >
+          LogOut
+        </button>
       </form>
     </div>
   );

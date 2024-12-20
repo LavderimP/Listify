@@ -1,6 +1,6 @@
 /* * Parent container */
 
-.login-container {
+.auth-container {
   background-color: #707579;
   padding: 30px 30px 0px;
   display: flex; /* Enables Flexbox for side-by-side alignment */
@@ -9,7 +9,7 @@
 }
 
 /* * Right side container  */
-.login-images-container {
+.auth-images-container {
   width: 50%;
   background-color: #d9d9d9;
   && #logo-img {
@@ -23,7 +23,7 @@
 }
 
 /* * Left (Login) side container  */
-.login-form-container {
+.auth-form-container {
   padding: 20px 20px 0px;
   display: block;
   align-items: center;
@@ -73,7 +73,7 @@
 }
 
 /* * Left (SignUp) side container  */
-.login-form-container {
+.auth-form-container {
   padding: 20px 20px 0px;
   display: block;
   align-items: center;

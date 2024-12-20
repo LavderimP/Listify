@@ -10,7 +10,7 @@ class ListManager(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "title",
-        "categories",
+        "category",
         "list_status",
         "text",
         "private",
@@ -19,7 +19,7 @@ class ListManager(admin.ModelAdmin):
         "profile",
         "created_at",
         "updated_at",
-        "categories",
+        "category",
         "list_status",
     )
     search_fields = (
@@ -28,7 +28,7 @@ class ListManager(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "title",
-        "categories",
+        "category",
         "list_status",
     )
 

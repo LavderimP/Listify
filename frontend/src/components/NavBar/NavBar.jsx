@@ -76,20 +76,17 @@ function NavBar({ onLogout, accessToken }) {
             </a>
             <ul className="dropdown-menu">
               <li>
-                <a
-                  className="nav-link text-secondary"
-                  href="/?categories=to-do"
-                >
+                <a className="nav-link text-secondary" href="/?category=to-do">
                   To-Do
                 </a>
               </li>
               <li>
-                <a className="nav-link text-secondary" href="/?categories=task">
+                <a className="nav-link text-secondary" href="/?category=task">
                   Task
                 </a>
               </li>
               <li>
-                <a className="nav-link text-secondary" href="/?categories=shop">
+                <a className="nav-link text-secondary" href="/?category=shop">
                   Shop
                 </a>
               </li>

@@ -11,12 +11,20 @@ urlpatterns = [
     #     "",
     #     include(router.urls),
     # ),
-    path("", ListViewSet.as_view({"get": "list"}, name="list_list")),
-    path("add/", ListViewSet.as_view({"post": "create"}, name="list_create")),
+    path("", ListViewSet.as_view({"get": "list"}), name="list_list"),
+    path("add/", ListViewSet.as_view({"post": "create"}), name="list_create"),
     path(
         "<int:pk>/",
         ListViewSet.as_view(
-            {"get": "retrieve", "put": "update", "delete": "destroy"}, name="list_RUD"
+            {"get": "retrieve", "put": "update", "delete": "destroy"},
         ),
+        name="list_detail",
+    ),
+    path(
+        "pin/<int:pk>/",
+        ListViewSet.as_view(
+            {"get": "pin"},
+        ),
+        name="pin",
     ),
 ]

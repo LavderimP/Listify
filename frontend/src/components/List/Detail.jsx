@@ -7,7 +7,7 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
   const { id } = useParams(); // Get the ID from the URL
   const [listData, setListData] = useState({
     title: "",
-    categories: "",
+    category: "",
     text: "",
     private: false,
   });
@@ -89,11 +89,11 @@ function Detail({ onUpdate, csrftoken, accessToken }) {
       </div>
       <div>
         <label>
-          Categories:
+          Category:
           <input
             type="text"
-            name="categories"
-            value={listData.categories}
+            name="category"
+            value={listData.category}
             onChange={handleChange}
             required
           />
