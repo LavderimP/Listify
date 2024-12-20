@@ -1,58 +1,168 @@
+/* Overall css */
 body {
   background-color: #d9d9d9;
-}
-
-.header-container {
-  text-align: center;
-  padding: 10px 0;
-  && input {
-    margin: 0 24%;
-    width: 600px;
-    border-radius: 25px;
-  }
-}
-
-h1 {
-  margin-left: 15%;
   color: #172a39;
 }
 
-p:hover {
-  color: #e95a44;
+/* Header Css (Logo, Search bar, Pfp) */
+.header-container {
+  text-align: center;
+  padding: 10px 0;
 }
 
+.search-container {
+  margin: 0 24%;
+  width: 600px;
+  && input {
+    border-radius: 25px;
+    height: 40px;
+    padding-left: 40px; /* Increase padding to make room for the icon */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: #707579;
+  }
+}
+
+.search-container {
+  position: relative; /* Make it the reference for absolute positioning */
+  display: inline-block; /* Shrink container size to its content */
+}
+
+.search-container input {
+  width: 600px;
+  border-radius: 25px;
+  height: 40px;
+  border: 1px solid #ccc;
+  padding-left: 45px; /* Adjust space for the icon */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px; /* Adjust position of the icon */
+  transform: translateY(-50%);
+  font-size: 18px; /* Adjust icon size */
+  color: #888;
+  pointer-events: none; /* Prevent clicking on the icon */
+}
+/* Side bar icons */
 .icon {
   color: #e95a44;
   font-size: 1em;
 }
 
-.pin-icon {
-  font-size: 2em;
+/* Above the lists */
+.content-text {
+  margin-left: 20%;
+  display: flex;
+  gap: 50px;
+  && a {
+    color: #172a39;
+    text-decoration: none;
+    padding-top: 1em;
+  }
+  && a:hover {
+    color: #e95a44;
+  }
 }
 
+/* Side bar and Lists map */
 .content-container {
   display: flex;
+  flex-wrap: wrap;
 }
 
+/* Side bar css (Add, Reminder, Trash) */
 .side-bar {
   width: 10%;
+  height: 100%;
   padding-left: 3%;
-  color: #172a39;
   font-size: 20px;
 }
 
+.list-action {
+  display: none;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
+.list-action.is-editing {
+  border: 2px #172a39 solid;
+  border-radius: 25px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 60%;
+  height: 200px;
+  margin: 20px 0 0 10%;
+  padding: 10px 20px 10px;
+  && input {
+    color: #172a39;
+    border: none;
+    background: fixed;
+  }
+}
+
+.list-action-header {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  background: fixed;
+
+  && input {
+    color: #172a39;
+    border: none;
+  }
+  && button {
+    background: fixed;
+    border-radius: 25px;
+    border: 1px solid;
+    width: 10%;
+    font-weight: 500;
+    font-size: medium;
+  }
+}
+
+.list-action-icons {
+  display: flex;
+  gap: 20px;
+  margin-left: 80%;
+  cursor: pointer;
+  && .icon {
+    color: #172a39;
+    font-size: 30px;
+  }
+}
+
+.list-action-body {
+  width: auto;
+  height: auto;
+}
+
+/* Lists Css (Lists data) */
 .list-map {
-  width: 90%;
+  width: 60%;
   color: white;
   display: grid;
-  margin: 20px 6% 0px;
-  padding: 10px 0px;
+  margin: 20px 10% 0;
+  padding: 10px 0;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+}
+
+.list-map.is-editing {
+  margin: 20px 20% 0;
 }
 
 .list-wrapper {
   border-radius: 25px;
   padding: 10px; /* Padding inside each list item */
   background-color: #707579; /* Darker background for better visibility */
+}
+
+.pin-icon {
+  font-size: 2em;
+  cursor: pointer;
+  color: #e95a44;
 }

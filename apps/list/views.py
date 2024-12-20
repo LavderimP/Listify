@@ -27,12 +27,19 @@ class ListViewSet(viewsets.ViewSet):
 
         # TODO: Add the status
         preferred_status = user_profile.preferred_status
-        categories = request.query_params.get("categories")
+        category_param = request.query_params.get("category")
+        title_param = request.query_params.get("title")
 
-        if categories is None:
-            queryset = List.objects.filter(profile=user_profile)
+        if title_param:
+            queryset = List.objects.filter(
+                profile=user_profile, title__icontains=title_param
+            )
+        elif category_param:
+            queryset = List.objects.filter(
+                profile=user_profile, category=category_param
+            )
         else:
-            queryset = List.objects.filter(profile=user_profile, categories=categories)
+            queryset = List.objects.filter(profile=user_profile)
 
         queryset = queryset.order_by("created_at")
 

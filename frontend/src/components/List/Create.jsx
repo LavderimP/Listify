@@ -5,7 +5,7 @@ function Create({ csrftoken, accessToken }) {
   const url = "http://127.0.0.1:8000/list/add/";
   const [listData, setListData] = useState({
     title: "",
-    categories: "to-do", // Default value for dropdown
+    category: "to-do", // Default value for dropdown
     private: false,
     text: "",
   });
@@ -39,7 +39,7 @@ function Create({ csrftoken, accessToken }) {
       .then(() => {
         setListData({
           title: "",
-          categories: "to-do",
+          category: "to-do",
           private: false,
           text: "",
         }); // Reset form
@@ -67,10 +67,10 @@ function Create({ csrftoken, accessToken }) {
         </div>
         <div>
           <label>
-            Categories:
+            Category:
             <select
-              name="categories"
-              value={listData.categories}
+              name="category"
+              value={listData.category}
               onChange={handleChange}
             >
               <option value="to-do">To-Do</option>
