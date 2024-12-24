@@ -33,6 +33,7 @@ class ListSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "created_at": {"format": "%Y-%m-%d %H:%M:%S"},
             "updated_at": {"format": "%Y-%m-%d %H:%M:%S"},
+            "reminder": {"format": "%Y-%m-%d %H:%M:%S"},
             "private_pass": {"required": False},
         }
 

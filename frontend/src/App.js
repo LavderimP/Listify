@@ -15,7 +15,6 @@ import ProfileDetail from "./components/Profile/ProfileDetail";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
-  const [listData, setListData] = useState([]);
 
   // Function to get tokens from localStorage
   const getTokensFromStorage = () => {
@@ -58,13 +57,6 @@ function App() {
     setAccessToken(accessToken);
   }, []);
 
-  // Function to update the list data after successful update
-  const handleListUpdate = (updatedList) => {
-    setListData((prevData) =>
-      prevData.map((list) => (list.id === updatedList.id ? updatedList : list))
-    );
-  };
-
   return (
     <div>
       <Router>
@@ -83,10 +75,7 @@ function App() {
                   />
                 }
               />
-              <Route
-                path="/"
-                element={<List accessToken={accessToken} listData={listData} />}
-              />
+              <Route path="/" element={<List />} />
               <Route
                 path="add/"
                 element={
@@ -96,11 +85,7 @@ function App() {
               <Route
                 path="list/:id/"
                 element={
-                  <Detail
-                    csrftoken={csrftoken}
-                    accessToken={accessToken}
-                    onUpdate={handleListUpdate} // Pass the update handler
-                  />
+                  <Detail csrftoken={csrftoken} accessToken={accessToken} />
                 }
               />
               <Route path="*" element={<Navigate to="/" />} />

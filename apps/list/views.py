@@ -29,19 +29,17 @@ class ListViewSet(viewsets.ViewSet):
         preferred_status = user_profile.preferred_status
         category_param = request.query_params.get("category")
         title_param = request.query_params.get("title")
+        reminder_param = request.query_params.get("reminder")
 
+        queryset = List.objects.filter(profile=user_profile).order_by("created_at")
+
+        # Apply filters based on query parameters
         if title_param:
-            queryset = List.objects.filter(
-                profile=user_profile, title__icontains=title_param
-            )
-        elif category_param:
-            queryset = List.objects.filter(
-                profile=user_profile, category=category_param
-            )
-        else:
-            queryset = List.objects.filter(profile=user_profile)
-
-        queryset = queryset.order_by("created_at")
+            queryset = queryset.filter(title__icontains=title_param)
+        if category_param:
+            queryset = queryset.filter(category=category_param)
+        if reminder_param is not None:  # Check if 'reminder' exists
+            queryset = queryset.filter(reminder__isnull=False)
 
         # Use ListSerializer for list view to hide private content
         serializer = ListSerializer(queryset, many=True, context={"list": True})
