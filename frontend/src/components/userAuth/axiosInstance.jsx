@@ -33,25 +33,33 @@ const getTokens = () => {
 // Use the function to get tokens
 const { accessToken, refreshToken } = getTokens();
 
-// if (authTokens) {
-// Decode and check if the token has expired
-// const decodedToken = jwt_decode(authTokens);
-// const isExpired = dayjs.unix(decodedToken.exp).isBefore(dayjs());
-
-// if (isExpired) {
-//   // Token is expired, remove it from localStorage
-//   authTokens = null;
-//   localStorage.removeItem("accessToken");
-// }
-// }
-
 const axiosInstance = axios.create({
   baseURL: baseURL, // Set the base URL for the API
   headers: {
-    Authorization: accessToken ? `Bearer ${accessToken}` : "", // Use the token directly
     "Content-Type": "application/json", // Specify that the API expects JSON
-    "X-CSRFToken": csrftoken, // Include CSRF token for security
   },
 });
+
+// Interceptor to add Authorization and X-CSRFToken dynamically before each request
+axiosInstance.interceptors.request.use(
+  (config) => {
+    // Dynamically add the Authorization and CSRF token
+    const accessToken = localStorage.getItem("accessToken"); // Or get it from your app state/context
+    const csrftoken = localStorage.getItem("csrftoken"); // Similarly, get the CSRF token dynamically
+
+    if (accessToken) {
+      config.headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+
+    if (csrftoken) {
+      config.headers["X-CSRFToken"] = csrftoken;
+    }
+
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default axiosInstance;

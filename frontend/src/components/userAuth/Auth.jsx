@@ -4,7 +4,7 @@ import Image1 from "../../assets/Image1.png";
 import "./Auth.css";
 import axiosInstance from "./axiosInstance";
 
-function Signin({ onLogin }) {
+function Auth({ onLogin }) {
   const [activeItem, setActiveItem] = useState({
     username: "",
     fullname: "",
@@ -190,4 +190,4 @@ function Signin({ onLogin }) {
   );
 }
 
-export default Signin;
+export default Auth;
