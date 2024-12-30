@@ -22,28 +22,11 @@ function App() {
     return { accessToken: storedAccessToken };
   };
 
-  // Function to get CSRF token from cookies (for secure requests)
-  const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== "") {
-      const cookies = document.cookie.split(";");
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i].trim();
-        if (cookie.substring(0, name.length + 1) === name + "=") {
-          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-          break;
-        }
-      }
-    }
-    return cookieValue;
-  };
-
-  const csrftoken = getCookie("csrftoken");
-
   // Callback function to set the token when sign in  is successful
   const handleSignin = (token) => {
     setAccessToken(token);
     localStorage.setItem("accessToken", token);
+    localStorage.setItem("refreshToken", token);
   };
 
   // Function to clear the tokens (for sign out)
@@ -61,33 +44,17 @@ function App() {
     <div>
       <Router>
         {!accessToken ? (
-          <Auth onLogin={handleSignin} accessToken={accessToken} />
+          <Auth onLogin={handleSignin} />
         ) : (
           <>
             <Routes>
               <Route
                 path="profile/"
-                element={
-                  <ProfileDetail
-                    csrftoken={csrftoken}
-                    onLogout={handleSignout}
-                    accessToken={accessToken}
-                  />
-                }
+                element={<ProfileDetail onLogout={handleSignout} />}
               />
               <Route path="/" element={<List />} />
-              <Route
-                path="add/"
-                element={
-                  <Create csrftoken={csrftoken} accessToken={accessToken} />
-                }
-              />
-              <Route
-                path="list/:id/"
-                element={
-                  <Detail csrftoken={csrftoken} accessToken={accessToken} />
-                }
-              />
+              <Route path="add/" element={<Create />} />
+              <Route path="list/:id/" element={<Detail />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </>
