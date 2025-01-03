@@ -4,6 +4,7 @@ import Logo from "../../assets/Logo.png";
 import searchLogo from "../../assets/search.svg";
 import "./List.css";
 import axiosInstance from "../userAuth/axiosInstance";
+import { jwtDecode } from "jwt-decode";
 import {
   VscEdit,
   VscBell,
@@ -18,9 +19,11 @@ import {
 function List() {
   const [lists, setLists] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
-  const [fetching, setFetching] = useState(true);
+
   const [searchBar, setSearchBar] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
+
+  const [fetching, setFetching] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,14 +33,25 @@ function List() {
   }, [fetching, categoryFilter, searchBar]);
 
   const getLists = async () => {
+    const token = localStorage.getItem("accessToken");
     const params = {};
+
     if (searchBar) params.title = searchBar;
     if (categoryFilter) params.category = categoryFilter;
+
+    if (!token) {
+      console.error("No access token found.");
+      return;
+    } else {
+      const decodedToken = jwtDecode(token);
+      setUserProfile(decodedToken);
+    }
 
     try {
       let response = await axiosInstance.get("list/", { params });
       if (response.status === 200) {
         setLists(response.data);
+        console.log(lists.length);
       } else if (response.status === 401) {
         return "Unauthorized!";
       }
@@ -49,9 +63,7 @@ function List() {
   const handleSearch = (e) => {
     if (e.key === "Enter") {
       // Update search parameters and trigger fetching
-      navigate(
-        `/?title=${encodeURIComponent(searchBar)}&category=${categoryFilter}`
-      );
+      navigate(`/?title=${encodeURIComponent(searchBar)}`);
       setFetching(true);
     }
   };
@@ -152,22 +164,6 @@ function List() {
           </div>
 
           {/* List Mapping */}
-          <div className="list-action">
-            <div className="list-action-header">
-              <p>Category:</p>
-              <input id="title-input" type="text" placeholder="Title" />
-              <button>Save</button>
-            </div>
-            <div className="list-action-body">
-              <input id="text-input" type="text" placeholder="Text here ..." />
-            </div>
-            <div className="list-action-icons">
-              <VscMic className="icon" title="Voice-To-Text" />
-              <VscFileMedia className="icon" title="Add Media" />
-              <VscBell className="icon" title="Add Reminder" />
-              <VscSend className="icon" title="Share" />
-            </div>
-          </div>
           <div className="list-map">
             {lists.length > 0 ? (
               lists.map((list) => (
