@@ -19,10 +19,9 @@ class ListViewSet(viewsets.ViewSet):
     # permission_classes = [AllowAny]
 
     def list(self, request):
-
-        # Use get_object_or_404 to handle the case where the user does not exist
-        user_obj = get_object_or_404(User, user=request.user.id)
-        if user_obj is None:
+        try:
+            user_obj = get_object_or_404(User, user_id=request.user.id)
+        except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         # TODO: Add the status
@@ -47,7 +46,10 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
-        user_obj = get_object_or_404(User, user=request.user.id)
+        try:
+            user_obj = get_object_or_404(User, user_id=request.user.id)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = ListSerializer(data=request.data)
         # pictures = request.FILES.getlist(
@@ -62,9 +64,9 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
-        req_user = request.user
-
-        if req_user is None:
+        try:
+            req_user = request.user
+        except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         queryset = get_object_or_404(List, list_id=pk)
@@ -72,9 +74,9 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def pin(self, request, pk=None):
-        req_user = request.user
-
-        if req_user is None:
+        try:
+            req_user = request.user
+        except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         queryset = get_object_or_404(List, list_id=pk)
@@ -86,9 +88,9 @@ class ListViewSet(viewsets.ViewSet):
         return Response(status=status.HTTP_200_OK)
 
     def update(self, request, pk=None):
-        req_user = request.user
-
-        if req_user is None:
+        try:
+            req_user = request.user
+        except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         queryset = get_object_or_404(List, list_id=pk)
@@ -107,9 +109,9 @@ class ListViewSet(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, pk=None):
-        req_user = request.user
-
-        if req_user is None:
+        try:
+            req_user = request.user
+        except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         queryset = get_object_or_404(List, list_id=pk)
