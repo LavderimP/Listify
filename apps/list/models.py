@@ -70,3 +70,23 @@ class ListPictures(models.Model):
 
     def __str__(self):
         return str(self.picture_id)
+
+
+class ListDownloads(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    download_id = models.BigAutoField(primary_key=True)
+    list_list = models.ForeignKey(List, on_delete=models.CASCADE)
+
+    name = models.CharField(max_length=100 ,blank=True, null=True)
+    qr_code = models.ImageField(
+        upload_to="list/media", height_field="image_height", width_field="image_width" ,blank=True, null=True
+    )
+    file_suffix = models.CharField(max_length=10 )
+    download = models.FileField(upload_to="list/downloads")
+
+    def __str__(self):
+        return str(self.name)
+
+    def save(self, *args, **kwargs):
+        self.name = self.list_list.title
+        super(ListDownloads, self).save(*args, **kwargs)
