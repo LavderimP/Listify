@@ -97,3 +97,4 @@ class Payments(models.Model):
     #     confirm_payment_intent = stripe.PaymentIntent.confirm(self.stripe_token)
 
     #     return super().save(*args, **kwargs)
+    
