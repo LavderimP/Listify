@@ -6,7 +6,7 @@ from .models import List, ListPictures
 class ListManager(admin.ModelAdmin):
     list_display = (
         "list_id",
-        "profile",
+        "user",
         "created_at",
         "updated_at",
         "title",
@@ -16,7 +16,7 @@ class ListManager(admin.ModelAdmin):
         "private",
     )
     list_filter = (
-        "profile",
+        "user",
         "created_at",
         "updated_at",
         "category",
@@ -24,7 +24,7 @@ class ListManager(admin.ModelAdmin):
     )
     search_fields = (
         "list_id",
-        "profile",
+        "user",
         "created_at",
         "updated_at",
         "title",
