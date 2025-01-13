@@ -61,7 +61,7 @@ class PaymentMethods(models.Model):
 
 class Payments(models.Model):
     # Relationships
-    profile = models.ForeignKey('profiles.Profiles', on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
     payment_method = models.ForeignKey(PaymentMethods, on_delete=models.CASCADE)
 
     payment_uuid = models.UUIDField(default=uuid.uuid4, editable=False)

@@ -49,15 +49,15 @@ class UserActionView(viewsets.ViewSet):
 
     def retrieve(self, request):
         req_user = request.user.id
-        user = get_object_or_404(User, user_id=req_user)
+        user = get_object_or_404(User, id=req_user)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request):
         req_user = request.user.id
-        user = get_object_or_404(User, user_id=req_user)
+        user = get_object_or_404(User, id=req_user)
 
-        if req_user != user.user_id:
+        if req_user != user.id:
             return Response(
                 {"detail": "Cannot update someone else's user data."},
                 status=status.HTTP_403_FORBIDDEN,
@@ -74,9 +74,9 @@ class UserActionView(viewsets.ViewSet):
         req_user = request.user  # Get the authenticated user
 
         # Get the profile or return 404 if not found
-        user = get_object_or_404(User, user=user.user_id)
+        user = get_object_or_404(User, user=user.id)
 
-        if req_user.user_id != user.id:
+        if req_user.id != user.id:
             return Response(
                 {"detail": "Cannot delete someone else's profile."},
                 status=status.HTTP_403_FORBIDDEN,

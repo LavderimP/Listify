@@ -21,7 +21,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     # User manager
     objects = CustomUserManager()
     # User info fields
-    user_id = models.AutoField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
@@ -29,9 +29,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     # User personal info
     username = models.CharField(unique=True, max_length=30, blank=True)
     fullname = models.CharField(max_length=30, blank=True)
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures/", blank=True, null=True
+    pfp = models.ImageField(
+        upload_to="pfp/", blank=True, null=True
     )
+    premium = models.BooleanField(default=False)
+    premium_until = models.DateTimeField(blank=True, null=True)
 
     USERNAME_FIELD = "username"
 
@@ -39,6 +41,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.fullname
 
     def get_short_name(self):
+        return self.username
+
+    def __str__(self):
         return self.username
 
     def save(self, *args, **kwargs):
