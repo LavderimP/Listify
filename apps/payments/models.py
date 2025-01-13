@@ -9,8 +9,7 @@ from django.urls import reverse
 
 
 class PaymentMethods(models.Model):
-    # Profile
-    profile = models.ForeignKey('profiles.Profiles', on_delete=models.CASCADE)
+    user = models.ForeignKey('user.User', on_delete=models.CASCADE)
 
     payment_method_uuid = models.UUIDField(default=uuid.uuid4, editable=False)
     payment_method_id = models.BigAutoField(primary_key=True)
