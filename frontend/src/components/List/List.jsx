@@ -224,22 +224,25 @@ function List({ csrftoken, accessToken }) {
         </div>
         <div className="content-container">
           <div className="side-bar">
+            
             <p
               title="Add New List"
               onClick={() => navigate("add/")}
-              style={{ cursor: "pointer" }}
             >
               <VscEdit className="icon" />
               Add List
             </p>
-            <p>
+
+            <p  title="Check Reminders">
               <VscBell className="icon" />
               Reminders
             </p>
-            <p onClick={handleTrashClick} style={{ cursor: "pointer" }}>
+
+            <p  title="Delete Lists" onClick={handleTrashClick} >
               <VscTrash className="icon" />
               {selectMode ? "Delete" : "Trash"}
             </p>
+
           </div>
 
           {/* List Mapping */}

@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "user",
     "profiles",
     "list",
+    'payments',
     # Libraries
     "django_extensions",  # this is a Django app adding additional features to Admin panel
     "rest_framework",  # Django Rest Rest Framework for building APIs
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt",  # Django restframework simpleJWT for authentication and token
     "rest_framework_simplejwt.token_blacklist",  # Simple JWT blacklist
     "axes",  # Django Axes for login attempts
+    'stripe',  # Stripe for payment
     # 'django_rest_passwordreset',  # Django restframework password reset
     # Django apps
     "django.contrib.admin",
@@ -209,3 +211,7 @@ SIMPLE_JWT = {
 # EMAIL_HOST_USER = "info.giskos@gmail.com"
 # EMAIL_HOST_PASSWORD = "kczymevaaqrpekrq"
 # DJANGO_REST_LOOKUP_FIELD = "email"
+
+
+STRIPE_SECRET_KEY  = 'sk_test_51Qeys6BVxag1vjTnNC4IAPW2x0dQSfjRnmiVOeE3X6xgVqtOniQn7BozcqIu7fApK0dWdQUxvOcdym4jQ6J28pVt00VhWvOIw0'
+STRIPE_PUBLIC_KEY  = 'pk_test_51Qeys6BVxag1vjTngdQRY5pjlGRhhbedDk986guCnbmOdLqzmFrYhZHU3vEoD7KEIHsqf1iEkXxeNSpXrCMIoWsX00UPTnJ97v'
