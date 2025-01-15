@@ -18,9 +18,6 @@ class UserSerializer(serializers.ModelSerializer):
             'premium_until',
         ]
 
-    def __init__(self, *args, **kwargs):
-        super(UserSerializer, self).__init__(*args, **kwargs)
-        if self.context['request'].method in ['POST', 'PUT']:
-            self.fields['password'] = serializers.CharField()
+    
 
 
