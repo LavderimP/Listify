@@ -20,7 +20,6 @@ DEBUG = True
 INSTALLED_APPS = [
     # Our apps
     "user",
-    "profiles",
     "list",
     'payments',
     # Libraries

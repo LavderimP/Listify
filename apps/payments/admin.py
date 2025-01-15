@@ -3,17 +3,17 @@ from .models import PaymentMethods, Payments
 
 class PaymentMethodsManager(admin.ModelAdmin):
     list_display = (
-        "pk",
-        "profile",
+        "payment_method_id",
+        "user",
         "card_brand",
     )
     list_filter = (
-        "profile",
+        "user",
         "card_brand",
     )
     search_fields = (
-        "pk",
-        "profile",
+        "payment_method_id",
+        "user",
         "card_brand",
     )
 
@@ -21,17 +21,17 @@ admin.site.register(PaymentMethods, PaymentMethodsManager)
 
 class PaymentsManager(admin.ModelAdmin):
     list_display = (
-        "pk",
-        "profile",
+        "payment_id",
+        "user",
         "amount",
     )
     list_filter = (
-        "profile",
+        "user",
         "amount",
     )
     search_fields = (
-        "pk",
-        "profile",
+        "payment_id",
+        "user",
         "amount",
     )
 

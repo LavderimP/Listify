@@ -18,21 +18,32 @@ class CustomUserManager(UserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    # User model
+    # User manager
+    objects = CustomUserManager()
+    # User info fields
+    id = models.BigAutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    objects = CustomUserManager()
-    # Personal info
+    # User personal info
     username = models.CharField(unique=True, max_length=30, blank=True)
     fullname = models.CharField(max_length=30, blank=True)
+    pfp = models.ImageField(
+        upload_to="media/pfp/", blank=True, null=True
+    )
+    premium = models.BooleanField(default=False)
+    premium_until = models.DateTimeField(blank=True, null=True)
 
     USERNAME_FIELD = "username"
-    # REQUIRED_FIELDS = ["email"]
 
     def get_full_name(self):
         return self.fullname
 
     def get_short_name(self):
+        return self.username
+
+    def __str__(self):
         return self.username
 
     def save(self, *args, **kwargs):

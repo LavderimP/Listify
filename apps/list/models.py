@@ -11,7 +11,7 @@ class List(models.Model):
     list_id = models.BigAutoField(primary_key=True)
 
     # * Relationships
-    profile = models.ForeignKey("profiles.Profiles", on_delete=models.CASCADE)
+    user = models.ForeignKey("user.User", on_delete=models.CASCADE)
     pictures = models.ManyToManyField("ListPictures", blank=True)
 
     # * Fields

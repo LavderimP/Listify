@@ -11,36 +11,36 @@ class PaymentMethodsViewSet(viewsets.ViewSet):
     def list(self, request):
         '''List all PaymentMethods'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = PaymentMethods.objects.filter(profile=user_profile)
+        queryset = PaymentMethods.objects.filter(user=req_user)
         serializer = PaymentMethodsSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
         '''Create a new PaymentMethod'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = PaymentMethodsSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(profile=user_profile)
+            serializer.save(user=req_user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         '''Retrieve a PaymentMethod'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(PaymentMethods, profile=user_profile, pk=pk)
+        queryset = get_object_or_404(PaymentMethods, user=req_user, pk=pk)
         if queryset.exists():
             serializer = PaymentMethodsSerializer(queryset)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -49,11 +49,11 @@ class PaymentMethodsViewSet(viewsets.ViewSet):
     def update(self, request, pk=None):
         '''Update a PaymentMethod'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(PaymentMethods, profile=user_profile, pk=pk)
+        queryset = get_object_or_404(PaymentMethods, user=req_user, pk=pk)
         if queryset.exists():
             serializer = PaymentMethodsSerializer(queryset, data=request.data)
             if serializer.is_valid():
@@ -65,11 +65,11 @@ class PaymentMethodsViewSet(viewsets.ViewSet):
     def destroy(self, request, pk=None):
         '''Delete a PaymentMethod'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(PaymentMethods, profile=user_profile, pk=pk)
+        queryset = get_object_or_404(PaymentMethods, user=req_user, pk=pk)
         if queryset.exists():
             queryset.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
@@ -81,36 +81,36 @@ class PaymentsViewSet(viewsets.ViewSet):
     def list(self, request):
         '''List all Payments'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = Payments.objects.filter(profile=user_profile)
+        queryset = Payments.objects.filter(user=req_user)
         serializer = PaymentSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
         '''Create a new Payment'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = PaymentSerializer(data=request.data)
 
         if serializer.is_valid():
-            serializer.save(profile=user_profile)
+            serializer.save(user=req_user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         '''Retrieve a Payment'''
         try:
-            user_profile = request.user.id
+            req_user = request.user.id
         except:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(Payments, profile=user_profile, pk=pk)
+        queryset = get_object_or_404(Payments, user=req_user, pk=pk)
         if queryset.exists():
             serializer = PaymentSerializer(queryset)
             return Response(serializer.data, status=status.HTTP_200_OK)

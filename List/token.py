@@ -7,12 +7,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
     def get_token(cls, user):
         token = super().get_token(user)
         token["username"] = user.username
-        token["id"] = user.pk
-        token["picture"] = (
-            user.profiles.profile_picture.url
-            if hasattr(user, "profiles") and user.profiles.profile_picture
-            else None
-        )
+        token["fullname"] = user.fullname
+        token["id"] = user.id
+        # token["pfp"] = (
+        #     user.pfp.url
+        # )
+        token["premium"] = user.premium
 
         return token
 

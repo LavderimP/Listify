@@ -21,7 +21,7 @@ function ProfileDetail({ csrftoken, onLogout, accessToken }) {
   };
 
   useEffect(() => {
-    const url = "http://127.0.0.1:8000/profiles/";
+    const url = "http://127.0.0.1:8000/user/";
 
     fetch(url, {
       method: "GET",
