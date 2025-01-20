@@ -21,7 +21,7 @@ function ProfileDetail({ csrftoken, onLogout, accessToken }) {
   };
 
   useEffect(() => {
-    const url = "http://127.0.0.1:8000/user/";
+    const url = "http://127.0.0.1:8000/profiles/";
 
     fetch(url, {
       method: "GET",
@@ -67,20 +67,6 @@ function ProfileDetail({ csrftoken, onLogout, accessToken }) {
             }}
           />
           {/* // ! To add change button */}
-        </div>
-        <div className="form-div">
-          <label>User:</label>
-          <input
-            type="text"
-            placeholder="User"
-            value={profileData.user.name || ""}
-            onChange={(e) =>
-              setProfileData({
-                ...profileData,
-                user: { ...profileData.user, name: e.target.value },
-              })
-            }
-          />
         </div>
         <div className="form-div">
           <label>Username:</label>

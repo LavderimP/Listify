@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import Logo from "../../assets/Logo.png";
 import Image1 from "../../assets/Image1.png";
 import "./Auth.css";
+import axiosInstance from "./axiosInstance";
 
-function Signin({ csrftoken, onLogin }) {
+function Auth({ onLogin }) {
   const [activeItem, setActiveItem] = useState({
     username: "",
     fullname: "",
@@ -21,74 +22,51 @@ function Signin({ csrftoken, onLogin }) {
     }));
   };
 
-  const signinApiCall = () => {
-    const url = "http://127.0.0.1:8000/login/";
-
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-type": "application/json",
-        "X-CSRFToken": csrftoken,
-      },
-      body: JSON.stringify(activeItem),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setActiveItem({
-          username: "",
-          password: "",
-        });
-
-        // If the login is successful, pass the token back to the parent
-        if (data.access) {
-          onLogin(data.access, data.refresh); // Pass access token to parent component
-        }
-      })
-      .catch((error) => {
-        setError("Login failed. Please try again.");
-        console.error("Error:", error);
+  const signinApiCall = async () => {
+    try {
+      const response = await axiosInstance.post("login/", {
+        username: activeItem.username,
+        password: activeItem.password,
       });
+
+      // Reset the form fields after successful login
+      setActiveItem({
+        username: "",
+        password: "",
+      });
+
+      // If the login is successful, pass the access and refresh tokens back to the parent component
+      if (response.data.access) {
+        onLogin(response.data.access, response.data.refresh); // Pass tokens to parent component
+      }
+    } catch (error) {
+      // If there's an error, set the error state
+      setError(error.message);
+      console.error("Error:", error);
+    }
   };
 
-  const signupApiCall = () => {
-    const url = "http://127.0.0.1:8000/register/";
+  const signupApiCall = async () => {
+    try {
+      const response = await axiosInstance.post("register/", activeItem);
 
-    fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrftoken,
-      },
-      body: JSON.stringify(activeItem),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          return response.json().then((errorData) => {
-            throw new Error(
-              errorData.detail || "Register failed. Please try again."
-            );
-          });
-        }
-        return response.json();
-      })
-      .then(() => signinApiCall()) // Pass signinApiCall as a callback function
-      .then(() => {
+      if (response.status === 201) {
+        // Wait for signinApiCall to complete before proceeding
+        await signinApiCall();
+
+        // Reset the form fields after successful login
         setActiveItem({
           username: "",
           fullname: "",
-          password1: "",
-          password2: "",
+          password: "",
+          password_confirm: "",
         });
-      })
-      .catch((error) => {
-        setError(error.message);
-        console.error("Error:", error);
-      });
+      }
+    } catch (error) {
+      // If there's an error, set the error state
+      setError(error.message);
+      console.error("Error:", error);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -212,4 +190,4 @@ function Signin({ csrftoken, onLogin }) {
   );
 }
 
-export default Signin;
+export default Auth;

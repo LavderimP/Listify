@@ -1,172 +1,78 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Hooks for navigation and URL management
-import Delete from "./Delete";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Logo from "../../assets/Logo.png";
 import searchLogo from "../../assets/search.svg";
 import "./List.css";
+import axiosInstance from "../userAuth/axiosInstance";
 import { jwtDecode } from "jwt-decode";
 import {
   VscEdit,
-  VscPinned,
-  VscPin,
-  VscGoToEditingSession,
   VscBell,
   VscTrash,
-  VscSend,
+  VscGoToEditingSession,
+  VscPinned,
   VscMic,
   VscFileMedia,
+  VscSend,
 } from "react-icons/vsc";
 
-function List({ csrftoken, accessToken }) {
+function List() {
   const [lists, setLists] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
-  const [fetching, setFetching] = useState(true);
-  const [adding, setAdding] = useState([]);
-  const [editing, setEditing] = useState(false);
-  const [selectMode, setSelectMode] = useState(false); // Toggle for selection mode
-  const [selectedLists, setSelectedLists] = useState([]); // Track selected lists
+
   const [searchBar, setSearchBar] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
 
-  const navigate = useNavigate(); // For programmatic navigation
-  const location = useLocation(); // To get current URL and query parameters
+  const [fetching, setFetching] = useState(true);
+  const navigate = useNavigate();
 
-  // Function to fetch lists from the API, filtered by category or title if applicable
-  const fetchLists = useCallback(() => {
-    if (accessToken) {
-      try {
-        const decoded = jwtDecode(accessToken);
-        setUserProfile(decoded); // Set the decoded profile info
-      } catch (error) {
-        return <div>"Invalid token", {error}</div>;
+  useEffect(() => {
+    if (fetching) {
+      getLists();
+    }
+  }, [fetching, categoryFilter, searchBar]);
+
+  const getLists = async () => {
+    const token = localStorage.getItem("accessToken");
+    const params = {};
+
+    if (searchBar) params.title = searchBar;
+    if (categoryFilter) params.category = categoryFilter;
+
+    if (!token) {
+      console.error("No access token found.");
+      return;
+    } else {
+      const decodedToken = jwtDecode(token);
+      setUserProfile(decodedToken);
+    }
+
+    try {
+      let response = await axiosInstance.get("list/", { params });
+      if (response.status === 200) {
+        setLists(response.data);
+        console.log(lists.length);
+      } else if (response.status === 401) {
+        return "Unauthorized!";
       }
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-
-    const queryParams = new URLSearchParams(location.search); // Parse query parameters
-
-    const categoryParam = queryParams.get("category"); // Get 'category' parameter
-    const titleParam = queryParams.get("title");
-
-    // Decide the URL based on the presence of category and title parameters
-    const url = categoryParam
-      ? titleParam
-        ? `http://127.0.0.1:8000/list/?category=${categoryParam}&title=${titleParam}`
-        : `http://127.0.0.1:8000/list/?category=${categoryParam}`
-      : titleParam
-      ? `http://127.0.0.1:8000/list/?title=${titleParam}`
-      : "http://127.0.0.1:8000/list/";
-
-    const headers = {
-      "Content-Type": "application/json", // API expects JSON
-      "X-CSRFToken": csrftoken, // Include CSRF token
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
-    }
-
-    fetch(url, { method: "GET", headers })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to fetch data.");
-        return response.json(); // Parse response as JSON
-      })
-      .then((data) => {
-        setLists(data); // Update state with fetched lists
-        setFetching(false); // Stop fetching
-      })
-      .catch((error) => {
-        console.error("Error fetching lists:", error); // Log any errors
-      });
-  }, [accessToken, location.search, csrftoken]); // Dependencies: re-run when these change
+  };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
-      // Navigate to the URL with the search term
+      // Update search parameters and trigger fetching
       navigate(`/?title=${encodeURIComponent(searchBar)}`);
       setFetching(true);
     }
   };
 
-  const handlePinClick = (list_id) => {
-    const url = `http://127.0.0.1:8000/list/pin/${list_id}/`;
-
-    const headers = {
-      "Content-Type": "application/json", // API expects JSON
-      "X-CSRFToken": csrftoken, // Include CSRF token
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
-    }
-
-    fetch(url, {
-      method: "GET",
-      headers,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to fetch data.");
-        return response.json(); // Parse response as JSON
-      })
-      .then(() => {
-        setFetching(true); // Update the fetching state to trigger a re-render
-      })
-      .catch((error) => {
-        console.error("Error updating pin status:", error);
-      });
+  const handleCategoryClick = (category) => {
+    setCategoryFilter(category);
+    navigate(`/?category=${category}`);
+    setFetching(true);
   };
-
-  const handleListClick = (listId) => {
-    setEditing((prevEditing) => !prevEditing);
-  };
-
-  const handleTrashClick = () => {
-    if (!selectMode) {
-      setSelectMode(true); // Enable selection mode
-      setSelectedLists([]); // Reset selected lists
-    } else {
-      // Call API to delete selected lists
-      const deletePromises = selectedLists.map((listId) => {
-        const url = `http://127.0.0.1:8000/list/${listId}`;
-        const headers = {
-          "Content-Type": "application/json", // API expects JSON
-          "X-CSRFToken": csrftoken, // Include CSRF token
-        };
-
-        if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
-        }
-
-        return fetch(url, { method: "DELETE", headers }).then((response) => {
-          if (!response.ok) {
-            console.error(`Failed to delete list with id ${listId}`);
-          } else {
-            console.log(`Successfully deleted list with id ${listId}`);
-          }
-        });
-      });
-
-      Promise.all(deletePromises)
-        .then(() => {
-          setFetching(true); // Trigger re-fetch after deletion
-          setSelectMode(false); // Exit selection mode
-        })
-        .catch((error) => console.error("Error deleting lists:", error));
-    }
-  };
-
-  const handleListSelect = (listId) => {
-    if (selectedLists.includes(listId)) {
-      setSelectedLists(selectedLists.filter((id) => id !== listId));
-    } else {
-      setSelectedLists([...selectedLists, listId]);
-    }
-  };
-
-  // useEffect to trigger fetchLists when 'fetching' changes
-  useEffect(() => {
-    if (fetching) {
-      fetchLists(); // Fetch lists when the component mounts or fetching is true
-    }
-  }, [fetching, fetchLists]);
 
   return (
     <div className="list-container">
@@ -177,13 +83,12 @@ function List({ csrftoken, accessToken }) {
           src={Logo}
           alt="Logo"
           title="Home"
-          style={{
-            cursor: "pointer",
-          }}
+          style={{ cursor: "pointer" }}
           onClick={() => {
             setFetching(true);
-            navigate("/"); // Navigate after setting fetching to true
-            setSearchBar(""); // Clear Search bar
+            navigate("/");
+            setSearchBar("");
+            setCategoryFilter(""); // Reset the category filter
           }}
         />
         <div className="search-container">
@@ -212,96 +117,67 @@ function List({ csrftoken, accessToken }) {
             borderRadius: "50%",
             cursor: "pointer",
           }}
-          onClick={() => navigate("profile/")} // Correctly call the function here
+          onClick={() => navigate("profile/")}
         />
       </div>
+
       <div className="body-container">
         <div className="content-text">
           <h1>My Lists</h1>
-          <a href="/?category=to-do">To-Do</a>
-          <a href="/?category=task">Task</a>
-          <a href="/?category=shop">Shop</a>
+          <a
+            href="javascript:void(0);"
+            onClick={() => handleCategoryClick("to-do")}
+          >
+            To-Do
+          </a>
+          <a
+            href="javascript:void(0);"
+            onClick={() => handleCategoryClick("task")}
+          >
+            Task
+          </a>
+          <a
+            href="javascript:void(0);"
+            onClick={() => handleCategoryClick("shop")}
+          >
+            Shop
+          </a>
         </div>
         <div className="content-container">
           <div className="side-bar">
-            
             <p
               title="Add New List"
               onClick={() => navigate("add/")}
+              style={{ cursor: "pointer" }}
             >
               <VscEdit className="icon" />
               Add List
             </p>
-
-            <p  title="Check Reminders">
+            <p>
               <VscBell className="icon" />
               Reminders
             </p>
-
-            <p  title="Delete Lists" onClick={handleTrashClick} >
+            <p style={{ cursor: "pointer" }}>
               <VscTrash className="icon" />
-              {selectMode ? "Delete" : "Trash"}
+              Trash
             </p>
-
           </div>
 
           {/* List Mapping */}
-          <div className={`list-action ${editing ? "is-editing" : ""}`}>
-            <div className="list-action-header">
-              <p>Category:</p>
-              <input id="title-input" type="text" placeholder="Title" />
-              <button>Save</button>
-            </div>
-            <div className="list-action-body">
-              <input id="text-input" type="text" placeholder="Text here ..." />
-            </div>
-            <div className="list-action-icons">
-              <VscMic className="icon" title="Voice-To-Text" />
-              <VscFileMedia className="icon" title="Add Media" />
-              <VscBell className="icon" title="Add Reminder" />
-              <VscSend className="icon" title="Share" />
-            </div>
-          </div>
-          <div className={`list-map  ${editing ? "is-editing" : ""}`}>
+          <div className="list-map">
             {lists.length > 0 ? (
               lists.map((list) => (
-                <div
-                  key={list.list_id}
-                  className={`list-wrapper ${
-                    selectMode && selectedLists.includes(list.list_id)
-                      ? "selected"
-                      : ""
-                  }`}
-                >
-                  {selectMode && (
-                    <input
-                      type="checkbox"
-                      checked={selectedLists.includes(list.list_id)}
-                      onChange={() => handleListSelect(list.list_id)}
-                    />
-                  )}
+                <div key={list.list_id} className="list-wrapper">
                   <div className="list-header">
                     <p>
                       {list.pined ? (
-                        <VscPinned
-                          title="Pinned"
-                          className="pin-icon"
-                          onClick={() => handlePinClick(list.list_id)}
-                        />
+                        <VscPinned title="Pinned" className="pin-icon" />
                       ) : null}
                       <span>
-                        <span
-                          style={{
-                            color: "#e95a44",
-                          }}
-                        >
+                        <span style={{ color: "#e95a44" }}>
                           {list.category}
                         </span>{" "}
-                        <span
-                          style={{
-                            fontSize: "15px",
-                          }}
-                        >
+                        <span style={{ fontSize: "15px" }}>
                           {list.created_at.replace(/-/g, ".").slice(0, 10)}
                         </span>
                       </span>
@@ -312,22 +188,17 @@ function List({ csrftoken, accessToken }) {
                           fontSize: "25px",
                           cursor: "pointer",
                         }}
-                        onClick={() => handleListClick(list.list_id)}
                         title="Edit List"
                       />
                     </p>
                     <p>Private: {list.private ? "yes" : "no"}</p>
-                    <p>Reminder: {list.reminder || "no"} </p>
+                    <p>Reminder: {list.reminder || "no"}</p>
                   </div>
                   <div className="list-body">
-                    <p
-                      style={{
-                        borderBottom: "1px white solid",
-                      }}
-                    >
+                    <p style={{ borderBottom: "1px white solid" }}>
                       Title: {list.title}
                     </p>
-                    <p>{list.private ? null : ` Text: ${list.text}`}</p>
+                    <p>{list.private ? null : `Text: ${list.text}`}</p>
                     <p>
                       {list.pictures > 0 ? (
                         <img
