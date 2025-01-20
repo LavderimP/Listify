@@ -51,7 +51,6 @@ function List() {
       let response = await axiosInstance.get("list/", { params });
       if (response.status === 200) {
         setLists(response.data);
-        console.log(lists.length);
       } else if (response.status === 401) {
         return "Unauthorized!";
       }
@@ -104,8 +103,8 @@ function List() {
         <img
           id="pfp-icon"
           src={
-            userProfile?.picture
-              ? `http://127.0.0.1:8000${userProfile.picture}`
+            userProfile?.pfp
+              ? `http://127.0.0.1:8000${userProfile.pfp}`
               : "/default-profile.png"
           }
           alt="Profile"
