@@ -27,15 +27,14 @@ class ListViewSet(viewsets.ViewSet):
         # TODO: Add the status
         category_param = request.query_params.get("category")
         title_param = request.query_params.get("title")
+        reminder_param = request.query_params.get("reminder")
 
         if title_param:
-            queryset = List.objects.filter(
-                user=user_obj, title__icontains=title_param
-            )
+            queryset = List.objects.filter(user=user_obj, title__icontains=title_param)
         elif category_param:
-            queryset = List.objects.filter(
-                user=user_obj, category=category_param
-            )
+            queryset = List.objects.filter(user=user_obj, category=category_param)
+        elif reminder_param is not None:
+            queryset = List.objects.filter(user=user_obj, reminder__isnull=False)
         else:
             queryset = List.objects.filter(user=user_obj)
 
@@ -70,7 +69,7 @@ class ListViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, user=user_obj ,list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
         serializer = ListSerializer(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -80,7 +79,7 @@ class ListViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, user=user_obj,list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
 
         # Toggle the pined status
         queryset.pined = not queryset.pined
@@ -94,7 +93,7 @@ class ListViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, user=user_obj,list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
 
         # Only allow update if user is the owner
         if queryset.user != user_obj:
@@ -115,7 +114,7 @@ class ListViewSet(viewsets.ViewSet):
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, user=user_obj,list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
 
         # Only allow deletion if user is the owner
         if queryset.user != user_obj:

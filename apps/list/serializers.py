@@ -24,7 +24,6 @@ class ListSerializer(serializers.ModelSerializer):
             "title",
             "pictures",
             "category",
-            "list_status",
             "reminder",
             "pined",
             "private",
