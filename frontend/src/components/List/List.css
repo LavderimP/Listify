@@ -81,66 +81,42 @@ body {
   font-size: 20px;
 }
 
-.list-action {
+/* List Editing and Adding */
+.list-selectable {
   display: none;
   width: 0;
   height: 0;
   margin: 0;
 }
 
-.list-action.is-editing {
-  border: 2px #172a39 solid;
+.list-selectable.editing {
+  display: grid;
+  border: #172a39 solid 2px;
   border-radius: 25px;
-  display: flex;
-  flex-wrap: wrap;
+  padding: 10px;
+  margin: 20px 10% 0;
+  padding: 10px 0;
   width: 60%;
-  height: 200px;
-  margin: 20px 0 0 10%;
-  padding: 10px 20px 10px;
-  && input {
-    color: #172a39;
-    border: none;
-    background: fixed;
-  }
+  height: 100%;
 }
 
-.list-action-header {
+.list-selectable-header {
+  border: solid red 2px;
+  color: #172a39;
   display: flex;
-  flex-wrap: nowrap;
-  width: 100%;
-  background: fixed;
-
-  && input {
-    color: #172a39;
-    border: none;
-  }
+  margin: 0 5px;
+  justify-content: space-between;
+  border-bottom: #172a39 solid 2px;
   && button {
-    background: fixed;
+    background-color: fixed;
+    width: 200px;
+  }
+  && .save-btn {
     border-radius: 25px;
-    border: 1px solid;
-    width: 10%;
-    font-weight: 500;
-    font-size: medium;
   }
 }
 
-.list-action-icons {
-  display: flex;
-  gap: 20px;
-  margin-left: 80%;
-  cursor: pointer;
-  && .icon {
-    color: #172a39;
-    font-size: 30px;
-  }
-}
-
-.list-action-body {
-  width: auto;
-  height: auto;
-}
-
-/* Lists Css (Lists data) */
+/* Lists Mapping (Lists data) */
 .list-map {
   width: 60%;
   color: white;
@@ -149,6 +125,9 @@ body {
   padding: 10px 0;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
+}
+.list-map.editing {
+  margin: 20px 20% 0;
 }
 
 .list-map.is-editing {

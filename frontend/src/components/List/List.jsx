@@ -18,10 +18,13 @@ import {
 
 function List() {
   const [lists, setLists] = useState([]);
+  const [editing, setEditing] = useState(false);
+  const [addList, setAddList] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
 
   const [searchBar, setSearchBar] = useState("");
   const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
+  const [reminderFilter, setReminderFilter] = useState(false);
 
   const [fetching, setFetching] = useState(true);
   const navigate = useNavigate();
@@ -30,7 +33,7 @@ function List() {
     if (fetching) {
       getLists();
     }
-  }, [fetching, categoryFilter, searchBar]);
+  }, [fetching, categoryFilter, searchBar, reminderFilter]);
 
   const getLists = async () => {
     const token = localStorage.getItem("accessToken");
@@ -38,6 +41,9 @@ function List() {
 
     if (searchBar) params.title = searchBar;
     if (categoryFilter) params.category = categoryFilter;
+    if (reminderFilter === true) {
+      params.reminder = true;
+    }
 
     if (!token) {
       console.error("No access token found.");
@@ -71,6 +77,16 @@ function List() {
     setCategoryFilter(category);
     navigate(`/?category=${category}`);
     setFetching(true);
+  };
+
+  const handleReminderClick = () => {
+    setReminderFilter(!reminderFilter);
+    navigate("/?reminder");
+    setFetching(true);
+  };
+
+  const handleEditClick = () => {
+    setEditing(!editing);
   };
 
   return (
@@ -122,22 +138,35 @@ function List() {
 
       <div className="body-container">
         <div className="content-text">
-          <h1>My Lists</h1>
+          <h1
+            onClick={() => {
+              setFetching(true);
+              navigate("/");
+              setSearchBar("");
+              setCategoryFilter(""); // Reset the category filter
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            My Lists
+          </h1>
           <a
             href="javascript:void(0);"
             onClick={() => handleCategoryClick("to-do")}
+            style={{ cursor: "pointer" }}
           >
             To-Do
           </a>
           <a
             href="javascript:void(0);"
             onClick={() => handleCategoryClick("task")}
+            style={{ cursor: "pointer" }}
           >
             Task
           </a>
           <a
             href="javascript:void(0);"
             onClick={() => handleCategoryClick("shop")}
+            style={{ cursor: "pointer" }}
           >
             Shop
           </a>
@@ -152,7 +181,7 @@ function List() {
               <VscEdit className="icon" />
               Add List
             </p>
-            <p>
+            <p onClick={handleReminderClick} style={{ cursor: "pointer" }}>
               <VscBell className="icon" />
               Reminders
             </p>
@@ -161,9 +190,29 @@ function List() {
               Trash
             </p>
           </div>
-
+          <div className={`list-selectable ${editing ? "editing" : ""}`}>
+            <div className="list-selectable-header">
+              <button className="cat-btn">Category</button>
+              <h2>Title</h2>
+              <button className="save-btn">Save</button>
+            </div>
+            <div className="list-selectable-body">
+              <p>Text</p>
+            </div>
+            <div className="list-selectable-footer">
+              <button>
+                <VscMic title="Voice" />
+              </button>
+              <button>
+                <VscFileMedia title="Media" />
+              </button>
+              <button>
+                <VscSend title="Send" />
+              </button>
+            </div>
+          </div>
           {/* List Mapping */}
-          <div className="list-map">
+          <div className={`list-map ${editing ? "editing" : ""}`}>
             {lists.length > 0 ? (
               lists.map((list) => (
                 <div key={list.list_id} className="list-wrapper">
@@ -188,6 +237,7 @@ function List() {
                           cursor: "pointer",
                         }}
                         title="Edit List"
+                        onClick={() => handleEditClick()}
                       />
                     </p>
                     <p>Private: {list.private ? "yes" : "no"}</p>
@@ -214,11 +264,11 @@ function List() {
                 style={{
                   textAlign: "center",
                   width: "50%",
-                  margin: "0 auto",
+                  margin: "0 80%",
                   color: "#172a39",
                 }}
               >
-                No lists to show. Why not add one now! :D
+                No lists to show.
               </p>
             )}
           </div>
