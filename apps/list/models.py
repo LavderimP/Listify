@@ -26,7 +26,7 @@ class List(models.Model):
     )
     pined = models.BooleanField(default=False, null=True, blank=True)
     reminder = models.DateTimeField(null=True, blank=True)
-    text = models.TextField(max_length=500, null=True, blank=True)
+    text = models.TextField(max_length=800, null=True, blank=True)
     private = models.BooleanField(default=False, null=True, blank=True)
     private_pass = models.CharField(max_length=100, null=True, blank=True)
 

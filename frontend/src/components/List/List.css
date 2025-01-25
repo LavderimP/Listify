@@ -95,23 +95,81 @@ body {
   border-radius: 25px;
   padding: 10px;
   margin: 20px 10% 0;
-  padding: 10px 0;
   width: 60%;
   height: 100%;
 }
 
 .list-selectable-header {
-  border: solid red 2px;
+  background-color: fixed;
   color: #172a39;
   display: flex;
   margin: 0 5px;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   border-bottom: #172a39 solid 2px;
-  && button {
-    background-color: fixed;
-    width: 200px;
+  margin: 0 20px;
+  && input {
+    background: none;
+    color: #172a39;
   }
-  && .save-btn {
+  && .category-input {
+    border: 1px solid #172a39;
+    border-radius: 10px;
+    background: none;
+  }
+  && .title-input {
+    border: none;
+    background: none;
+    color: #172a39;
+    font-size: 1.5em;
+    font-weight: semi-bold;
+    width: 100%;
+    padding-left: 15px;
+  }
+  && .title-input:focus {
+    outline: none;
+  }
+  && button {
+    background: none;
+    color: #172a39;
+    border: 1px solid #172a39;
+    border-radius: 25px;
+    width: 100px;
+    height: 30px;
+    font-weight: bold;
+  }
+  && button:hover {
+    background: #172a39;
+    color: white;
+  }
+}
+
+.list-selectable-body {
+  margin: 10px 5px;
+  && .text-input {
+    border: none; /* No border */
+    background: none; /* Transparent background */
+    color: #172a39; /* Text color */
+    font-size: 1em; /* Text size */
+    overflow: hidden; /* Hide overflowing text */
+    resize: none; /* Disable resizing */
+    width: 100%; /* Full width */
+  }
+  && .text-input:focus {
+    border: none; /* No border */
+    outline: none; /* No outline */
+  }
+}
+
+.list-selectable-footer {
+  display: flex;
+  margin: 0 5px;
+  justify-content: right;
+  padding: 0 15px;
+  gap: 5px;
+  && button {
+    background: none;
+    color: #172a39;
+    border: none;
     border-radius: 25px;
   }
 }

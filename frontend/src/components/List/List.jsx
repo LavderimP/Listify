@@ -19,7 +19,8 @@ import {
 function List() {
   const [lists, setLists] = useState([]);
   const [editing, setEditing] = useState(false);
-  const [addList, setAddList] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [listEditing, setListEditing] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
 
   const [searchBar, setSearchBar] = useState("");
@@ -85,8 +86,45 @@ function List() {
     setFetching(true);
   };
 
-  const handleEditClick = () => {
+  const handleEditClick = (list) => {
     setEditing(!editing);
+    if (!editing) {
+      setListEditing(list);
+    } else {
+      setListEditing([]);
+    }
+  };
+
+  const handleSaveClick = async () => {
+    if (!adding) {
+      try {
+        let response = await axiosInstance.put(
+          `list/${listEditing.list_id}/`,
+          listEditing
+        );
+        if (response.status === 200) {
+          setEditing(false);
+          setFetching(true);
+        } else {
+          console.error("Error saving data:", response);
+        }
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
+    } else {
+      try {
+        let response = await axiosInstance.post(`list/`, listEditing);
+        if (response.status === 200) {
+          setEditing(false);
+          setFetching(true);
+          setAdding(false);
+        } else {
+          console.error("Error saving data:", response);
+        }
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
+    }
   };
 
   return (
@@ -192,17 +230,44 @@ function List() {
           </div>
           <div className={`list-selectable ${editing ? "editing" : ""}`}>
             <div className="list-selectable-header">
-              <button className="cat-btn">Category</button>
-              <h2>Title</h2>
-              <button className="save-btn">Save</button>
+              <input
+                className="category-input"
+                placeholder="Category"
+                value={listEditing.category || ""}
+                onChange={(e) =>
+                  setListEditing({ ...listEditing, category: e.target.value })
+                }
+              />
+              <input
+                className="title-input"
+                placeholder="Title"
+                value={listEditing.title || ""}
+                onChange={(e) =>
+                  setListEditing({ ...listEditing, title: e.target.value })
+                }
+              />
+              <button className="save-btn" onClick={handleSaveClick}>
+                Save
+              </button>
             </div>
             <div className="list-selectable-body">
-              <p>Text</p>
+              <textarea
+                className="text-input"
+                placeholder="Text"
+                value={listEditing.text || ""}
+                onChange={(e) => {
+                  const target = e.target;
+                  setListEditing({ ...listEditing, text: target.value });
+                }}
+                ref={(textarea) => {
+                  if (textarea) {
+                    textarea.style.height = "auto"; // Reset height
+                    textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
+                  }
+                }}
+              />
             </div>
             <div className="list-selectable-footer">
-              <button>
-                <VscMic title="Voice" />
-              </button>
               <button>
                 <VscFileMedia title="Media" />
               </button>
@@ -237,7 +302,7 @@ function List() {
                           cursor: "pointer",
                         }}
                         title="Edit List"
-                        onClick={() => handleEditClick()}
+                        onClick={() => handleEditClick(list)}
                       />
                     </p>
                     <p>Private: {list.private ? "yes" : "no"}</p>
@@ -245,9 +310,15 @@ function List() {
                   </div>
                   <div className="list-body">
                     <p style={{ borderBottom: "1px white solid" }}>
-                      Title: {list.title}
+                      {list.title}
                     </p>
-                    <p>{list.private ? null : `Text: ${list.text}`}</p>
+                    <p>
+                      {list.private
+                        ? null
+                        : `${list.text.substring(0, 100)}${
+                            list.text.length > 100 ? "..." : ""
+                          }`}
+                    </p>
                     <p>
                       {list.pictures > 0 ? (
                         <img
