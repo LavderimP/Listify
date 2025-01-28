@@ -11,7 +11,6 @@ import {
   VscTrash,
   VscGoToEditingSession,
   VscPinned,
-  VscMic,
   VscFileMedia,
   VscSend,
 } from "react-icons/vsc";
@@ -48,6 +47,7 @@ function List() {
 
     if (!token) {
       console.error("No access token found.");
+      setFetching(false);
       return;
     } else {
       const decodedToken = jwtDecode(token);
@@ -63,6 +63,8 @@ function List() {
       }
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+      setFetching(false);
     }
   };
 
@@ -104,22 +106,26 @@ function List() {
         );
         if (response.status === 200) {
           setEditing(false);
-          setFetching(true);
-        } else {
-          console.error("Error saving data:", response);
+          setListEditing([]);
+        } else if (response.status === 401) {
+          return "Unauthorized";
+        } else if (response.status === 404) {
+          return "Object not found";
         }
       } catch (error) {
         console.error("Error saving data:", error);
       }
     } else {
       try {
-        let response = await axiosInstance.post(`list/`, listEditing);
-        if (response.status === 200) {
+        let response = await axiosInstance.post(`list/add/`, listEditing);
+        if (response.status === 201) {
           setEditing(false);
-          setFetching(true);
           setAdding(false);
-        } else {
-          console.error("Error saving data:", response);
+          setListEditing([]);
+        } else if (response.status === 401) {
+          return "Unauthorized";
+        } else if (response.status === 404) {
+          return "Object not found";
         }
       } catch (error) {
         console.error("Error saving data:", error);
@@ -213,7 +219,10 @@ function List() {
           <div className="side-bar">
             <p
               title="Add New List"
-              onClick={() => navigate("add/")}
+              onClick={() => {
+                setAdding(!adding);
+                setEditing(!editing);
+              }}
               style={{ cursor: "pointer" }}
             >
               <VscEdit className="icon" />
@@ -223,10 +232,12 @@ function List() {
               <VscBell className="icon" />
               Reminders
             </p>
-            <p style={{ cursor: "pointer" }}>
-              <VscTrash className="icon" />
-              Trash
-            </p>
+            {editing ? (
+              <p style={{ cursor: "pointer" }}>
+                <VscTrash className="icon" />
+                Trash
+              </p>
+            ) : null}
           </div>
           <div className={`list-selectable ${editing ? "editing" : ""}`}>
             <div className="list-selectable-header">
@@ -246,7 +257,13 @@ function List() {
                   setListEditing({ ...listEditing, title: e.target.value })
                 }
               />
-              <button className="save-btn" onClick={handleSaveClick}>
+              <button
+                className="save-btn"
+                onClick={() => {
+                  handleSaveClick();
+                  setFetching(true);
+                }}
+              >
                 Save
               </button>
             </div>
