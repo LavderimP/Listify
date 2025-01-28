@@ -133,6 +133,19 @@ function List() {
     }
   };
 
+  const handleDeleteClick = async () => {
+    let response = await axiosInstance.delete(
+      `list/${listEditing.list_id}/`,
+      listEditing
+    );
+    if (response.status === 204) {
+      setEditing(false);
+      setListEditing([]);
+    } else {
+      return response.data;
+    }
+  };
+
   return (
     <div className="list-container">
       {/* Logo */}
@@ -233,7 +246,13 @@ function List() {
               Reminders
             </p>
             {editing ? (
-              <p style={{ cursor: "pointer" }}>
+              <p
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  handleDeleteClick();
+                  setFetching(true);
+                }}
+              >
                 <VscTrash className="icon" />
                 Trash
               </p>
