@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Logo from "../../assets/Logo.png";
-import searchLogo from "../../assets/search.svg";
+import { jwtDecode } from "jwt-decode";
 import "./List.css";
 import axiosInstance from "../userAuth/axiosInstance";
-import { jwtDecode } from "jwt-decode";
+import Logo from "../../assets/Logo.png";
+import searchLogo from "../../assets/search.svg";
 import {
   VscEdit,
   VscBell,
@@ -16,18 +16,19 @@ import {
 } from "react-icons/vsc";
 
 function List() {
-  const [lists, setLists] = useState([]);
-  const [editing, setEditing] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [listEditing, setListEditing] = useState([]);
-  const [userProfile, setUserProfile] = useState(null);
+  const [lists, setLists] = useState([]); // To handle list data
+  const [listEditing, setListEditing] = useState([]); // To handle list editing data
+  const [editing, setEditing] = useState(false); // To handle editing state
+  const [adding, setAdding] = useState(false); // To handle adding state
 
-  const [searchBar, setSearchBar] = useState("");
+  const [userProfile, setUserProfile] = useState(null); // To handle user profile data
+
+  const [searchBar, setSearchBar] = useState(""); // For search bar
   const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
-  const [reminderFilter, setReminderFilter] = useState(false);
+  const [reminderFilter, setReminderFilter] = useState(false); // For reminder filter
 
-  const [fetching, setFetching] = useState(true);
-  const navigate = useNavigate();
+  const [fetching, setFetching] = useState(true); // To handle fetching state
+  const navigate = useNavigate(); // To handle navigation
 
   useEffect(() => {
     if (fetching) {

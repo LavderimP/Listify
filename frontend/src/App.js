@@ -8,9 +8,7 @@ import {
 } from "react-router-dom";
 
 import List from "./components/List/List";
-import Detail from "./components/List/Detail";
 import Auth from "./components/userAuth/Auth";
-import Create from "./components/List/Create";
 import ProfileDetail from "./components/Profile/ProfileDetail";
 
 function App() {
@@ -53,8 +51,6 @@ function App() {
                 element={<ProfileDetail onLogout={handleSignout} />}
               />
               <Route path="/" element={<List />} />
-              <Route path="add/" element={<Create />} />
-              <Route path="list/:id/" element={<Detail />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </>
