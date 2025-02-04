@@ -42,7 +42,6 @@ class UserCreateView(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class UserActionView(viewsets.ViewSet):
     # TODO Update the pk arg in retreive update and delete (delete needs to be deleted and made with password check)
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users access
@@ -69,8 +68,7 @@ class UserActionView(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(        self,
-        request,    ):
+    def destroy(self, request):
         req_user = request.user  # Get the authenticated user
 
         # Get the profile or return 404 if not found
