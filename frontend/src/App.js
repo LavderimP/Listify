@@ -9,7 +9,7 @@ import {
 
 import List from "./components/List/List";
 import Auth from "./components/userAuth/Auth";
-import ProfileDetail from "./components/Profile/ProfileDetail";
+import Profile from "./components/Profile/Profile";
 
 function App() {
   const [accessToken, setAccessToken] = useState(null);
@@ -48,7 +48,7 @@ function App() {
             <Routes>
               <Route
                 path="profile/"
-                element={<ProfileDetail onLogout={handleSignout} />}
+                element={<Profile onLogout={handleSignout} />}
               />
               <Route path="/" element={<List />} />
               <Route path="*" element={<Navigate to="/" />} />

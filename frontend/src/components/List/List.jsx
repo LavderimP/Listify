@@ -14,6 +14,8 @@ import {
   VscFileMedia,
   VscSend,
 } from "react-icons/vsc";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function List() {
   const [lists, setLists] = useState([]); // To handle list data
@@ -108,9 +110,13 @@ function List() {
         if (response.status === 200) {
           setEditing(false);
           setListEditing([]);
+          toast.success("List updated successfully!");
+          setFetching(true);
         } else if (response.status === 401) {
+          toast.error("Unauthorized");
           return "Unauthorized";
         } else if (response.status === 404) {
+          toast.error("Object not found");
           return "Object not found";
         }
       } catch (error) {
@@ -123,9 +129,13 @@ function List() {
           setEditing(false);
           setAdding(false);
           setListEditing([]);
+          toast.success("List added successfully!");
+          setFetching(true);
         } else if (response.status === 401) {
+          toast.error("Unauthorized");
           return "Unauthorized";
         } else if (response.status === 404) {
+          toast.error("Object not found");
           return "Object not found";
         }
       } catch (error) {
@@ -142,13 +152,17 @@ function List() {
     if (response.status === 204) {
       setEditing(false);
       setListEditing([]);
+      setFetching(true);
+      alert("List deleted successfully!");
     } else {
+      alert("Error deleting list.");
       return response.data;
     }
   };
 
   return (
     <div className="list-container">
+      <ToastContainer position="top-center" autoClose={3000} />
       {/* Logo */}
       <div className="header-container">
         <img
@@ -251,7 +265,6 @@ function List() {
                 style={{ cursor: "pointer" }}
                 onClick={() => {
                   handleDeleteClick();
-                  setFetching(true);
                 }}
               >
                 <VscTrash className="icon" />
@@ -281,7 +294,6 @@ function List() {
                 className="save-btn"
                 onClick={() => {
                   handleSaveClick();
-                  setFetching(true);
                 }}
               >
                 Save
