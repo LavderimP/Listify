@@ -17,14 +17,15 @@ function App() {
   // Function to get tokens from localStorage
   const getTokensFromStorage = () => {
     const storedAccessToken = localStorage.getItem("accessToken");
-    return { accessToken: storedAccessToken };
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+    return { accessToken: storedAccessToken, refreshToken: storedRefreshToken };
   };
 
-  // Callback function to set the token when sign in  is successful
-  const handleSignin = (token) => {
-    setAccessToken(token);
-    localStorage.setItem("accessToken", token);
-    localStorage.setItem("refreshToken", token);
+  // Callback function to set the tokens when sign-in is successful
+  const handleSignin = (accessToken, refreshToken) => {
+    setAccessToken(accessToken);
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("refreshToken", refreshToken);
   };
 
   // Function to clear the tokens (for sign out)
@@ -47,7 +48,7 @@ function App() {
           <>
             <Routes>
               <Route
-                path="profile/"
+                path="user/"
                 element={<Profile onLogout={handleSignout} />}
               />
               <Route path="/" element={<List />} />

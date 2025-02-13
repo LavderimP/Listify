@@ -64,8 +64,11 @@ function Auth({ onLogin }) {
       }
     } catch (error) {
       // If there's an error, set the error state
-      setError(error.message);
-      console.error("Error:", error);
+      const errorMessage = error.response
+        ? error.response.data.detail
+        : error.message;
+      setError(errorMessage);
+      console.error("Error:", errorMessage);
     }
   };
 
@@ -84,6 +87,12 @@ function Auth({ onLogin }) {
   const handleButtonClick = (e) => {
     e.preventDefault();
     setSide(!side);
+    setActiveItem({
+      username: "",
+      fullname: "",
+      password: "",
+      password_confirm: "",
+    });
   };
 
   return (

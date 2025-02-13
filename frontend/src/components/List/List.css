@@ -57,12 +57,12 @@ body {
   margin-left: 20%;
   display: flex;
   gap: 50px;
-  && a {
+  && p {
     color: #172a39;
     text-decoration: none;
     padding-top: 1em;
   }
-  && a:hover {
+  && p:hover {
     color: #e95a44;
   }
 }
@@ -79,6 +79,11 @@ body {
   height: 100%;
   padding-left: 3%;
   font-size: 20px;
+  && img {
+    width: 20px;
+    height: 20px;
+    margin: 5px 5px 10px 10px;
+  }
 }
 
 /* List Editing and Adding */
@@ -177,6 +182,7 @@ body {
 /* Lists Mapping (Lists data) */
 .list-map {
   width: 60%;
+  height: 300px;
   color: white;
   display: grid;
   margin: 20px 10% 0;
@@ -202,4 +208,16 @@ body {
   font-size: 2em;
   cursor: pointer;
   color: #e95a44;
+}
+
+.list-header {
+  display: flex;
+  flex-direction: row;
+  && p {
+    padding-top: 10px;
+    padding-left: 5px;
+  }
+  && img {
+    margin-bottom: 25px;
+  }
 }

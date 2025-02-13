@@ -45,7 +45,6 @@ axiosInstance.interceptors.request.use(
   (config) => {
     // Dynamically add the Authorization and CSRF token
     const accessToken = localStorage.getItem("accessToken"); // Or get it from your app state/context
-    const csrftoken = localStorage.getItem("csrftoken"); // Similarly, get the CSRF token dynamically
 
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -58,6 +57,45 @@ axiosInstance.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor to handle token refresh
+axiosInstance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        try {
+          const response = await axios.post(`${baseURL}refresh/`, {
+            refresh: refreshToken,
+          });
+
+          const newAccessToken = response.data.access;
+          localStorage.setItem("accessToken", newAccessToken);
+          console.log("Access token refreshed", newAccessToken);
+
+          axiosInstance.defaults.headers[
+            "Authorization"
+          ] = `Bearer ${newAccessToken}`;
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+          return axiosInstance(originalRequest);
+        } catch (err) {
+          console.error("Refresh token expired or invalid", err);
+          // Handle token refresh failure (e.g., redirect to login)
+        }
+      }
+    }
+
     return Promise.reject(error);
   }
 );

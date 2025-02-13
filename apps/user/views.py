@@ -72,7 +72,7 @@ class UserActionView(viewsets.ViewSet):
         req_user = request.user  # Get the authenticated user
 
         # Get the profile or return 404 if not found
-        user = get_object_or_404(User, user=user.id)
+        user = get_object_or_404(User, id=req_user.id)
 
         if req_user.id != user.id:
             return Response(

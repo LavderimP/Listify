@@ -33,7 +33,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         upload_to="media/pfp/",
         blank=True,
         null=True,
-        default="media/pfp/default.webp",
+        default="media/pfp/profile_pic.png",
     )
     premium = models.BooleanField(default=False)
     premium_until = models.DateTimeField(blank=True, null=True)

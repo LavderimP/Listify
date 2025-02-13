@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import "./List.css";
+
 import axiosInstance from "../userAuth/axiosInstance";
+
+// Icons and Styles
+import "./List.css";
 import Logo from "../../assets/Logo.png";
-import searchLogo from "../../assets/search.svg";
-import {
-  VscEdit,
-  VscBell,
-  VscTrash,
-  VscGoToEditingSession,
-  VscPinned,
-  VscFileMedia,
-  VscSend,
-} from "react-icons/vsc";
+import search from "../../assets/search.svg";
+import bell from "../../assets/bell 1.svg";
+import edit from "../../assets/edit.svg";
+import trash from "../../assets/trash.svg";
+import send from "../../assets/send.svg";
+
+// Notifications
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -179,7 +179,7 @@ function List() {
           }}
         />
         <div className="search-container">
-          <img src={searchLogo} alt="Search icon" className="search-icon" />
+          <img src={search} alt="Search icon" className="search-icon" />
           <input
             type="text"
             placeholder="Search..."
@@ -196,7 +196,7 @@ function List() {
               : "/default-profile.png"
           }
           alt="Profile"
-          title="Profile Settings"
+          title="Profile"
           style={{
             width: "80px",
             height: "80px",
@@ -204,7 +204,7 @@ function List() {
             borderRadius: "50%",
             cursor: "pointer",
           }}
-          onClick={() => navigate("profile/")}
+          onClick={() => navigate("user/")}
         />
       </div>
 
@@ -221,27 +221,24 @@ function List() {
           >
             My Lists
           </h1>
-          <a
-            href="javascript:void(0);"
+          <p
             onClick={() => handleCategoryClick("to-do")}
             style={{ cursor: "pointer" }}
           >
             To-Do
-          </a>
-          <a
-            href="javascript:void(0);"
+          </p>
+          <p
             onClick={() => handleCategoryClick("task")}
             style={{ cursor: "pointer" }}
           >
             Task
-          </a>
-          <a
-            href="javascript:void(0);"
+          </p>
+          <p
             onClick={() => handleCategoryClick("shop")}
             style={{ cursor: "pointer" }}
           >
             Shop
-          </a>
+          </p>
         </div>
         <div className="content-container">
           <div className="side-bar">
@@ -253,11 +250,15 @@ function List() {
               }}
               style={{ cursor: "pointer" }}
             >
-              <VscEdit className="icon" />
+              <img src={edit} alt="edit icon" className="edit-icon" />
               Add List
             </p>
-            <p onClick={handleReminderClick} style={{ cursor: "pointer" }}>
-              <VscBell className="icon" />
+            <p
+              title="Lists with Reminder"
+              onClick={handleReminderClick}
+              style={{ cursor: "pointer" }}
+            >
+              <img src={bell} alt="Reminder icon" className="reminder-icon" />
               Reminders
             </p>
             {editing ? (
@@ -267,7 +268,7 @@ function List() {
                   handleDeleteClick();
                 }}
               >
-                <VscTrash className="icon" />
+                <img src={trash} alt="trash icon" className="trash-icon" />
                 Trash
               </p>
             ) : null}
@@ -317,12 +318,7 @@ function List() {
               />
             </div>
             <div className="list-selectable-footer">
-              <button>
-                <VscFileMedia title="Media" />
-              </button>
-              <button>
-                <VscSend title="Send" />
-              </button>
+              <img src={send} alt="send icon" className="send-icon" />
             </div>
           </div>
           {/* List Mapping */}
@@ -331,31 +327,38 @@ function List() {
               lists.map((list) => (
                 <div key={list.list_id} className="list-wrapper">
                   <div className="list-header">
-                    <p>
-                      {list.pined ? (
-                        <VscPinned title="Pinned" className="pin-icon" />
-                      ) : null}
-                      <span>
-                        <span style={{ color: "#e95a44" }}>
-                          {list.category}
-                        </span>{" "}
-                        <span style={{ fontSize: "15px" }}>
-                          {list.created_at.replace(/-/g, ".").slice(0, 10)}
-                        </span>
-                      </span>
-                      <VscGoToEditingSession
-                        style={{
-                          marginLeft: "50%",
-                          color: "#e95a44",
-                          fontSize: "25px",
-                          cursor: "pointer",
-                        }}
-                        title="Edit List"
-                        onClick={() => handleEditClick(list)}
-                      />
+                    {list.pined ? (
+                      // <img src={pin} alt="pin icon" className="pin-icon" />
+                      <p>pin icon</p>
+                    ) : null}
+                    <p style={{ color: "#e95a44" }}>{list.category}</p>
+                    <p style={{ fontSize: "15px" }}>
+                      {list.created_at.replace(/-/g, ".").slice(0, 10)}
                     </p>
-                    <p>Private: {list.private ? "yes" : "no"}</p>
-                    <p>Reminder: {list.reminder || "no"}</p>
+                    <img
+                      src={edit}
+                      alt="edit icon"
+                      className="edit-icon"
+                      title="Edit List"
+                      style={
+                        list.pined
+                          ? {
+                              marginLeft: "40%",
+                              color: "#e95a44",
+                              fontSize: "25px",
+                              cursor: "pointer",
+                            }
+                          : {
+                              marginLeft: "60%",
+                              color: "#e95a44",
+                              fontSize: "25px",
+                              cursor: "pointer",
+                            }
+                      }
+                      onClick={() => handleEditClick(list)}
+                    />
+                    {/* <p>Private: {list.private ? "yes" : "no"}</p> */}
+                    {/* <p>Reminder: {list.reminder || "no"}</p> */}
                   </div>
                   <div className="list-body">
                     <p style={{ borderBottom: "1px white solid" }}>
@@ -364,8 +367,8 @@ function List() {
                     <p>
                       {list.private
                         ? null
-                        : `${list.text.substring(0, 100)}${
-                            list.text.length > 100 ? "..." : ""
+                        : `${list.text.substring(0, 270)}${
+                            list.text.length > 270 ? "..." : ""
                           }`}
                     </p>
                     <p>
