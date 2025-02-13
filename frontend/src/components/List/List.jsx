@@ -387,11 +387,12 @@ function List() {
                 style={{
                   textAlign: "center",
                   width: "50%",
-                  margin: "0 80%",
-                  color: "#172a39",
+                  color: "red",
+                  marginLeft: "100%",
+                  marginTop: "10%",
                 }}
               >
-                No lists to show.
+                Server is down!
               </p>
             )}
           </div>
