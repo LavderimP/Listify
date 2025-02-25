@@ -1,6 +1,6 @@
 /* Overall css */
 body {
-  background-color: #d9d9d9;
+  background-color: #dddad5;
   color: #172a39;
 }
 
@@ -11,6 +11,8 @@ body {
 }
 
 .search-container {
+  position: relative; /* Make it the reference for absolute positioning */
+  display: inline-block; /* Shrink container size to its content */
   margin: 0 20%;
   width: 600px;
   && input {
@@ -18,13 +20,8 @@ body {
     height: 40px;
     padding-left: 40px; /* Increase padding to make room for the icon */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    color: #707579;
+    color: #172a39;
   }
-}
-
-.search-container {
-  position: relative; /* Make it the reference for absolute positioning */
-  display: inline-block; /* Shrink container size to its content */
 }
 
 .search-container input {
@@ -43,12 +40,12 @@ body {
   left: 15px; /* Adjust position of the icon */
   transform: translateY(-50%);
   font-size: 18px; /* Adjust icon size */
-  color: #888;
   pointer-events: none; /* Prevent clicking on the icon */
 }
+
 /* Side bar icons */
 .icon {
-  color: #e95a44;
+  color: #fc573b;
   font-size: 1em;
 }
 
@@ -63,7 +60,7 @@ body {
     padding-top: 1em;
   }
   && p:hover {
-    color: #e95a44;
+    color: #fc573b;
   }
 }
 
@@ -120,6 +117,12 @@ body {
     border: 1px solid #172a39;
     border-radius: 10px;
     background: none;
+    width: 150px;
+    text-align: center;
+    && option {
+      color: #172a39;
+      background-color: #d9d9d9;
+    }
   }
   && .title-input {
     border: none;
@@ -151,6 +154,7 @@ body {
 .list-selectable-body {
   margin: 10px 5px;
   && .text-input {
+    margin-left: 10px;
     border: none; /* No border */
     background: none; /* Transparent background */
     color: #172a39; /* Text color */
@@ -170,7 +174,8 @@ body {
   margin: 0 5px;
   justify-content: right;
   padding: 0 15px;
-  gap: 5px;
+  gap: 10px;
+  height: 30px;
   && button {
     background: none;
     color: #172a39;
@@ -194,20 +199,20 @@ body {
   margin: 20px 20% 0;
 }
 
-.list-map.is-editing {
-  margin: 20px 20% 0;
-}
-
 .list-wrapper {
   border-radius: 25px;
   padding: 10px; /* Padding inside each list item */
   background-color: #707579; /* Darker background for better visibility */
 }
 
+.list-wrapper.editing {
+  background-color: #afb2b4;
+}
+
 .pin-icon {
   font-size: 2em;
   cursor: pointer;
-  color: #e95a44;
+  color: #fc573b;
 }
 
 .list-header {

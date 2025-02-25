@@ -21,7 +21,7 @@ body {
     margin: 1em 0 4em 2em;
     cursor: pointer;
     &&:hover {
-      color: #e95a44;
+      color: #fc573b;
     }
   }
   && h2 {
@@ -53,7 +53,7 @@ body {
     margin-left: 5em;
   }
   && input {
-    border: 2px solid #e95a44;
+    border: 2px solid #fc573b;
     border-radius: 10px;
     background: fixed;
     height: 50px;

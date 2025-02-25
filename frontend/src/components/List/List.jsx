@@ -7,11 +7,19 @@ import axiosInstance from "../userAuth/axiosInstance";
 // Icons and Styles
 import "./List.css";
 import Logo from "../../assets/Logo.png";
+
 import search from "../../assets/search.svg";
-import bell from "../../assets/bell 1.svg";
-import edit from "../../assets/edit.svg";
-import trash from "../../assets/trash.svg";
-import send from "../../assets/send.svg";
+import file from "../../assets/file.svg"; // For Adding Lists
+import pin from "../../assets/pin.svg"; // For Pinned Lists
+import bell from "../../assets/bell.svg"; // For Reminder Filter
+import edit from "../../assets/edit.svg"; // For Editing Lists
+import trash from "../../assets/trash.svg"; // For Deleting Lists
+
+import send from "../../assets/send.svg"; // For Sending Lists
+import imageDark from "../../assets/image-dark.svg"; // For Adding Images
+import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
+import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
+import mice from "../../assets/mice.svg"; // For Pinned Lists
 
 // Notifications
 import { ToastContainer, toast } from "react-toastify";
@@ -153,9 +161,9 @@ function List() {
       setEditing(false);
       setListEditing([]);
       setFetching(true);
-      alert("List deleted successfully!");
+      toast.success("List deleted successfully!");
     } else {
-      alert("Error deleting list.");
+      toast.error("Error deleting list");
       return response.data;
     }
   };
@@ -250,7 +258,7 @@ function List() {
               }}
               style={{ cursor: "pointer" }}
             >
-              <img src={edit} alt="edit icon" className="edit-icon" />
+              <img src={file} alt="file icon" className="file-icon" />
               Add List
             </p>
             <p
@@ -275,14 +283,18 @@ function List() {
           </div>
           <div className={`list-selectable ${editing ? "editing" : ""}`}>
             <div className="list-selectable-header">
-              <input
+              <select
                 className="category-input"
-                placeholder="Category"
                 value={listEditing.category || ""}
                 onChange={(e) =>
                   setListEditing({ ...listEditing, category: e.target.value })
                 }
-              />
+              >
+                <option value="">Category</option>
+                <option value="to-do">To-Do</option>
+                <option value="shop">Shop</option>
+                <option value="yask">Task</option>
+              </select>
               <input
                 className="title-input"
                 placeholder="Title"
@@ -318,6 +330,17 @@ function List() {
               />
             </div>
             <div className="list-selectable-footer">
+              {/* <img src={mice} alt="mice icon" className="mice-icon" /> */}
+              {/* <img
+                src={imageDark}
+                alt="imageDark icon"
+                className="imageDark-icon"
+              /> */}
+              <img
+                src={bellDark}
+                alt="bellDark icon"
+                className="bellDark-icon"
+              />
               <img src={send} alt="send icon" className="send-icon" />
             </div>
           </div>
@@ -325,11 +348,13 @@ function List() {
           <div className={`list-map ${editing ? "editing" : ""}`}>
             {lists.length > 0 ? (
               lists.map((list) => (
-                <div key={list.list_id} className="list-wrapper">
+                <div
+                  key={list.list_id}
+                  className={` list-wrapper  ${editing ? "editing" : ""}`}
+                >
                   <div className="list-header">
                     {list.pined ? (
-                      // <img src={pin} alt="pin icon" className="pin-icon" />
-                      <p>pin icon</p>
+                      <img src={pin} alt="pin icon" className="pin-icon" />
                     ) : null}
                     <p style={{ color: "#e95a44" }}>{list.category}</p>
                     <p style={{ fontSize: "15px" }}>
@@ -392,7 +417,7 @@ function List() {
                   marginTop: "10%",
                 }}
               >
-                Server is down!
+                No lists found
               </p>
             )}
           </div>
