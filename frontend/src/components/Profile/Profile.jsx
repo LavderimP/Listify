@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../userAuth/axiosInstance";
 import "./Profile.css";
-import { VscArrowLeft, VscEdit } from "react-icons/vsc";
+import { VscArrowLeft } from "react-icons/vsc";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -15,9 +15,20 @@ function ProfileDetail({ onLogout }) {
     premium: "",
     premium_until: "",
   });
+
+  const [passwordData, setPasswordData] = useState({
+    old_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+
   const [paymentData, setPaymentData] = useState([]);
 
-  const [clicked, setClicked] = useState(true);
+  const [clicked, setClicked] = useState({
+    profileClick: true,
+    passwordClick: false,
+    paymentsClick: false,
+  });
 
   const [fetching, setFetching] = useState(true);
   const navigate = useNavigate();
@@ -29,14 +40,6 @@ function ProfileDetail({ onLogout }) {
       getProfile();
     }
   }, [fetching]);
-
-  if (!token) {
-    console.error("No access token found.");
-    setFetching(false);
-    onLogout();
-    navigate("/");
-    return;
-  }
 
   const handleLogoutClick = () => {
     onLogout();
@@ -57,7 +60,7 @@ function ProfileDetail({ onLogout }) {
       setFetching(false);
     }
 
-    if (clicked) {
+    if (clicked.paymentsClick) {
       getPayments();
     }
   };
@@ -151,14 +154,42 @@ function ProfileDetail({ onLogout }) {
         <h2
           title="Edit Profile"
           style={{ cursor: "pointer" }}
-          onClick={() => setClicked(true)}
+          onClick={() =>
+            setClicked((prevState) => ({
+              ...prevState,
+              profileClick: true,
+              passwordClick: false,
+              paymentsClick: false,
+            }))
+          }
         >
           Profile Settings
         </h2>
         <h2
+          title="Password"
+          style={{ cursor: "pointer" }}
+          onClick={() =>
+            setClicked((prevState) => ({
+              ...prevState,
+              profileClick: false,
+              passwordClick: true,
+              paymentsClick: false,
+            }))
+          }
+        >
+          Password
+        </h2>
+        <h2
           title="Payments"
           style={{ cursor: "pointer" }}
-          onClick={() => setClicked(false)}
+          onClick={() =>
+            setClicked((prevState) => ({
+              ...prevState,
+              profileClick: false,
+              passwordClick: false,
+              paymentsClick: true,
+            }))
+          }
         >
           Payments
         </h2>
@@ -172,14 +203,14 @@ function ProfileDetail({ onLogout }) {
         </button>
       </div>
       <div className="profile-content">
-        {clicked ? (
+        {clicked.profileClick ? (
           <>
             {" "}
             <img
               src={`http://127.0.0.1:8000${profileData.pfp}`}
               alt="Profile Picture"
             />
-            <p style={{ color: "grey" }}>Edit Profile</p>
+            <p style={{ color: "grey", textAlign: "center" }}>Edit Profile</p>
             <input
               type="text"
               placeholder="Username"
@@ -225,11 +256,60 @@ function ProfileDetail({ onLogout }) {
               Delete Profile
             </button>
           </>
-        ) : (
+        ) : null}
+        {clicked.passwordClick ? (
           <>
-            <h3>Payments</h3>
+            <h2>Change Password</h2>
+            <input
+              type="password"
+              placeholder="Old Password"
+              value={passwordData.old_password}
+              onChange={(e) => {
+                setPasswordData({
+                  ...passwordData,
+                  old_password: e.target.value,
+                });
+              }}
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              value={passwordData.new_password}
+              onChange={(e) => {
+                setPasswordData({
+                  ...passwordData,
+                  new_password: e.target.value,
+                });
+              }}
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={passwordData.confirm_password}
+              onChange={(e) => {
+                setPasswordData({
+                  ...passwordData,
+                  confirm_password: e.target.value,
+                });
+              }}
+            />
+            <button
+              type="button"
+              className="save-btn"
+              title="Change Password"
+              onClick={() => {
+                console.log("Change Password");
+              }}
+            >
+              Change Password
+            </button>
           </>
-        )}
+        ) : null}
+        {clicked.paymentsClick ? (
+          <>
+            <h1>Payments</h1>
+          </>
+        ) : null}
       </div>
     </div>
   );

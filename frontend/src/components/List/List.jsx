@@ -56,14 +56,8 @@ function List() {
       params.reminder = true;
     }
 
-    if (!token) {
-      console.error("No access token found.");
-      setFetching(false);
-      return;
-    } else {
-      const decodedToken = jwtDecode(token);
-      setUserProfile(decodedToken);
-    }
+    const decodedToken = jwtDecode(token);
+    setUserProfile(decodedToken);
 
     try {
       let response = await axiosInstance.get("list/", { params });

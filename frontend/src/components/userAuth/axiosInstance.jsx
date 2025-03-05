@@ -1,6 +1,4 @@
 import axios from "axios";
-import jwt_decode from "jwt-decode";
-import dayjs from "dayjs";
 
 const baseURL = "http://127.0.0.1:8000/";
 
@@ -22,29 +20,18 @@ const getCookie = (name) => {
 
 const csrftoken = getCookie("csrftoken");
 
-// Function to get both tokens from localStorage
-const getTokens = () => {
-  const accessToken = localStorage.getItem("accessToken");
-  const refreshToken = localStorage.getItem("refreshToken");
-
-  return { accessToken, refreshToken };
-};
-
-// Use the function to get tokens
-const { accessToken, refreshToken } = getTokens();
-
+// Create Axios instance
 const axiosInstance = axios.create({
-  baseURL: baseURL, // Set the base URL for the API
+  baseURL: baseURL,
   headers: {
-    "Content-Type": "application/json", // Specify that the API expects JSON
+    "Content-Type": "application/json",
   },
 });
 
-// Interceptor to add Authorization and X-CSRFToken dynamically before each request
+// Request interceptor to add Authorization and CSRF token dynamically
 axiosInstance.interceptors.request.use(
   (config) => {
-    // Dynamically add the Authorization and CSRF token
-    const accessToken = localStorage.getItem("accessToken"); // Or get it from your app state/context
+    const accessToken = localStorage.getItem("accessToken");
 
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
@@ -56,43 +43,86 @@ axiosInstance.interceptors.request.use(
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Interceptor to handle token refresh
+// Flag to track if refresh request is already in progress
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+// Function to subscribe requests that need token refresh
+const subscribeTokenRefresh = (cb) => {
+  refreshSubscribers.push(cb);
+};
+
+// Function to notify all subscribers after refresh
+const onRefreshed = (newAccessToken) => {
+  refreshSubscribers.forEach((cb) => cb(newAccessToken));
+  refreshSubscribers = [];
+};
+
+// Response interceptor to handle token expiration
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry
+    ) {
       originalRequest._retry = true;
 
-      const refreshToken = localStorage.getItem("refreshToken");
-      if (refreshToken) {
-        try {
-          const response = await axios.post(`${baseURL}refresh/`, {
-            refresh: refreshToken,
+      // If already refreshing, queue the request
+      if (isRefreshing) {
+        return new Promise((resolve) => {
+          subscribeTokenRefresh((newAccessToken) => {
+            originalRequest.headers[
+              "Authorization"
+            ] = `Bearer ${newAccessToken}`;
+            resolve(axiosInstance(originalRequest));
           });
+        });
+      }
 
-          const newAccessToken = response.data.access;
-          localStorage.setItem("accessToken", newAccessToken);
-          console.log("Access token refreshed", newAccessToken);
+      isRefreshing = true;
 
-          axiosInstance.defaults.headers[
-            "Authorization"
-          ] = `Bearer ${newAccessToken}`;
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+      const refreshToken = localStorage.getItem("refreshToken");
 
-          return axiosInstance(originalRequest);
-        } catch (err) {
-          console.error("Refresh token expired or invalid", err);
-          // Handle token refresh failure (e.g., redirect to login)
-        }
+      if (!refreshToken) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/"; // Redirect to login
+        return Promise.reject(error);
+      }
+
+      try {
+        const response = await axios.post(`${baseURL}refresh/`, {
+          refresh: refreshToken,
+        });
+
+        const newAccessToken = response.data.access;
+        const newRefreshToken = response.data.refresh;
+
+        localStorage.setItem("accessToken", newAccessToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
+
+        axiosInstance.defaults.headers[
+          "Authorization"
+        ] = `Bearer ${newAccessToken}`;
+        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+
+        onRefreshed(newAccessToken);
+
+        return axiosInstance(originalRequest);
+      } catch (err) {
+        console.error("Refresh token expired or invalid", err);
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        window.location.href = "/"; // Redirect to login
+      } finally {
+        isRefreshing = false;
       }
     }
 
