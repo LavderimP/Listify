@@ -9,9 +9,9 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token["username"] = user.username
         token["fullname"] = user.fullname
         token["id"] = user.id
-        # token["pfp"] = (
-        #     user.pfp.url
-        # )
+        token["pfp"] = (
+            user.pfp.url
+        )
         token["premium"] = user.premium
 
         return token

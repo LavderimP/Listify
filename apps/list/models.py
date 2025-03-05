@@ -24,20 +24,9 @@ class List(models.Model):
     category = models.CharField(
         max_length=10, choices=CATEGORY_CHOICES, null=True, blank=True
     )
-    STATUS_CHOICES = [
-        ("completed", "Completed"),
-        ("progress", "On Progress"),
-    ]
-    list_status = models.CharField(
-        default="progress",
-        max_length=10,
-        choices=STATUS_CHOICES,
-        null=True,
-        blank=True,
-    )
     pined = models.BooleanField(default=False, null=True, blank=True)
     reminder = models.DateTimeField(null=True, blank=True)
-    text = models.TextField(max_length=500, null=True, blank=True)
+    text = models.TextField(max_length=800, null=True, blank=True)
     private = models.BooleanField(default=False, null=True, blank=True)
     private_pass = models.CharField(max_length=100, null=True, blank=True)
 
@@ -77,11 +66,15 @@ class ListDownloads(models.Model):
     download_id = models.BigAutoField(primary_key=True)
     list_list = models.ForeignKey(List, on_delete=models.CASCADE)
 
-    name = models.CharField(max_length=100 ,blank=True, null=True)
+    name = models.CharField(max_length=100, blank=True, null=True)
     qr_code = models.ImageField(
-        upload_to="list/media", height_field="image_height", width_field="image_width" ,blank=True, null=True
+        upload_to="list/media",
+        height_field="image_height",
+        width_field="image_width",
+        blank=True,
+        null=True,
     )
-    file_suffix = models.CharField(max_length=10 )
+    file_suffix = models.CharField(max_length=10)
     download = models.FileField(upload_to="list/downloads")
 
     def __str__(self):

@@ -20,22 +20,21 @@ class ListViewSet(viewsets.ViewSet):
 
     def list(self, request):
         try:
-            user_obj = get_object_or_404(User, user_id=request.user.id)
+            user_obj = get_object_or_404(User, id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         # TODO: Add the status
         category_param = request.query_params.get("category")
         title_param = request.query_params.get("title")
+        reminder_param = request.query_params.get("reminder")
 
         if title_param:
-            queryset = List.objects.filter(
-                user=user_obj, title__icontains=title_param
-            )
+            queryset = List.objects.filter(user=user_obj, title__icontains=title_param)
         elif category_param:
-            queryset = List.objects.filter(
-                user=user_obj, category=category_param
-            )
+            queryset = List.objects.filter(user=user_obj, category=category_param)
+        elif reminder_param is not None:
+            queryset = List.objects.filter(user=user_obj, reminder__isnull=False)
         else:
             queryset = List.objects.filter(user=user_obj)
 
@@ -47,11 +46,12 @@ class ListViewSet(viewsets.ViewSet):
 
     def create(self, request):
         try:
-            user_obj = get_object_or_404(User, user_id=request.user.id)
+            user_obj = get_object_or_404(User, id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = ListSerializer(data=request.data)
+
         # pictures = request.FILES.getlist(
         #     "pictures"
         # )  # Use FILES for file uploads and getlist for multiple files
@@ -65,21 +65,21 @@ class ListViewSet(viewsets.ViewSet):
 
     def retrieve(self, request, pk=None):
         try:
-            req_user = request.user
+            user_obj = get_object_or_404(User, id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
         serializer = ListSerializer(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def pin(self, request, pk=None):
         try:
-            req_user = request.user
+            user_obj = get_object_or_404(User, id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
 
         # Toggle the pined status
         queryset.pined = not queryset.pined
@@ -89,14 +89,14 @@ class ListViewSet(viewsets.ViewSet):
 
     def update(self, request, pk=None):
         try:
-            req_user = request.user
+            user_obj = get_object_or_404(User, id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
 
         # Only allow update if user is the owner
-        if queryset.user != req_user:
+        if queryset.user != user_obj:
             return Response(
                 {"detail": "You do not have permission to update this list."},
                 status=status.HTTP_403_FORBIDDEN,
@@ -110,14 +110,14 @@ class ListViewSet(viewsets.ViewSet):
 
     def destroy(self, request, pk=None):
         try:
-            req_user = request.user
+            user_obj = get_object_or_404(User, id=request.user.id)
         except User.DoesNotExist:
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
-        queryset = get_object_or_404(List, list_id=pk)
+        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
 
         # Only allow deletion if user is the owner
-        if queryset.user != req_user:
+        if queryset.user != user_obj:
             return Response(
                 {"detail": "You do not have permission to delete this list."},
                 status=status.HTTP_403_FORBIDDEN,

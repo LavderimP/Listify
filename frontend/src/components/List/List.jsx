@@ -1,175 +1,170 @@
-import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Hooks for navigation and URL management
-import Delete from "./Delete";
-import Logo from "../../assets/Logo.png";
-import searchLogo from "../../assets/search.svg";
-import "./List.css";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import {
-  VscEdit,
-  VscPinned,
-  VscPin,
-  VscGoToEditingSession,
-  VscBell,
-  VscTrash,
-  VscSend,
-  VscMic,
-  VscFileMedia,
-} from "react-icons/vsc";
 
-function List({ csrftoken, accessToken }) {
-  const [lists, setLists] = useState([]);
-  const [userProfile, setUserProfile] = useState(null);
-  const [fetching, setFetching] = useState(true);
-  const [adding, setAdding] = useState([]);
-  const [editing, setEditing] = useState(false);
-  const [selectMode, setSelectMode] = useState(false); // Toggle for selection mode
-  const [selectedLists, setSelectedLists] = useState([]); // Track selected lists
-  const [searchBar, setSearchBar] = useState("");
+import axiosInstance from "../userAuth/axiosInstance";
 
-  const navigate = useNavigate(); // For programmatic navigation
-  const location = useLocation(); // To get current URL and query parameters
+// Icons and Styles
+import "./List.css";
+import Logo from "../../assets/Logo.png";
 
-  // Function to fetch lists from the API, filtered by category or title if applicable
-  const fetchLists = useCallback(() => {
-    if (accessToken) {
-      try {
-        const decoded = jwtDecode(accessToken);
-        setUserProfile(decoded); // Set the decoded profile info
-      } catch (error) {
-        return <div>"Invalid token", {error}</div>;
+import search from "../../assets/search.svg";
+import file from "../../assets/file.svg"; // For Adding Lists
+import pin from "../../assets/pin.svg"; // For Pinned Lists
+import bell from "../../assets/bell.svg"; // For Reminder Filter
+import edit from "../../assets/edit.svg"; // For Editing Lists
+import trash from "../../assets/trash.svg"; // For Deleting Lists
+
+import send from "../../assets/send.svg"; // For Sending Lists
+import imageDark from "../../assets/image-dark.svg"; // For Adding Images
+import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
+import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
+import mice from "../../assets/mice.svg"; // For Pinned Lists
+
+// Notifications
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+function List() {
+  const [lists, setLists] = useState([]); // To handle list data
+  const [listEditing, setListEditing] = useState([]); // To handle list editing data
+  const [editing, setEditing] = useState(false); // To handle editing state
+  const [adding, setAdding] = useState(false); // To handle adding state
+
+  const [userProfile, setUserProfile] = useState(null); // To handle user profile data
+
+  const [searchBar, setSearchBar] = useState(""); // For search bar
+  const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
+  const [reminderFilter, setReminderFilter] = useState(false); // For reminder filter
+
+  const [fetching, setFetching] = useState(true); // To handle fetching state
+  const navigate = useNavigate(); // To handle navigation
+
+  useEffect(() => {
+    if (fetching) {
+      getLists();
+    }
+  }, [fetching, categoryFilter, searchBar, reminderFilter]);
+
+  const getLists = async () => {
+    const token = localStorage.getItem("accessToken");
+    const params = {};
+
+    if (searchBar) params.title = searchBar;
+    if (categoryFilter) params.category = categoryFilter;
+    if (reminderFilter === true) {
+      params.reminder = true;
+    }
+
+    const decodedToken = jwtDecode(token);
+    setUserProfile(decodedToken);
+
+    try {
+      let response = await axiosInstance.get("list/", { params });
+      if (response.status === 200) {
+        setLists(response.data);
+      } else if (response.status === 401) {
+        return "Unauthorized!";
       }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setFetching(false);
     }
-
-    const queryParams = new URLSearchParams(location.search); // Parse query parameters
-
-    const categoryParam = queryParams.get("category"); // Get 'category' parameter
-    const titleParam = queryParams.get("title");
-
-    // Decide the URL based on the presence of category and title parameters
-    const url = categoryParam
-      ? titleParam
-        ? `http://127.0.0.1:8000/list/?category=${categoryParam}&title=${titleParam}`
-        : `http://127.0.0.1:8000/list/?category=${categoryParam}`
-      : titleParam
-      ? `http://127.0.0.1:8000/list/?title=${titleParam}`
-      : "http://127.0.0.1:8000/list/";
-
-    const headers = {
-      "Content-Type": "application/json", // API expects JSON
-      "X-CSRFToken": csrftoken, // Include CSRF token
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
-    }
-
-    fetch(url, { method: "GET", headers })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to fetch data.");
-        return response.json(); // Parse response as JSON
-      })
-      .then((data) => {
-        setLists(data); // Update state with fetched lists
-        setFetching(false); // Stop fetching
-      })
-      .catch((error) => {
-        console.error("Error fetching lists:", error); // Log any errors
-      });
-  }, [accessToken, location.search, csrftoken]); // Dependencies: re-run when these change
+  };
 
   const handleSearch = (e) => {
     if (e.key === "Enter") {
-      // Navigate to the URL with the search term
+      // Update search parameters and trigger fetching
       navigate(`/?title=${encodeURIComponent(searchBar)}`);
       setFetching(true);
     }
   };
 
-  const handlePinClick = (list_id) => {
-    const url = `http://127.0.0.1:8000/list/pin/${list_id}/`;
-
-    const headers = {
-      "Content-Type": "application/json", // API expects JSON
-      "X-CSRFToken": csrftoken, // Include CSRF token
-    };
-
-    if (accessToken) {
-      headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
-    }
-
-    fetch(url, {
-      method: "GET",
-      headers,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to fetch data.");
-        return response.json(); // Parse response as JSON
-      })
-      .then(() => {
-        setFetching(true); // Update the fetching state to trigger a re-render
-      })
-      .catch((error) => {
-        console.error("Error updating pin status:", error);
-      });
+  const handleCategoryClick = (category) => {
+    setCategoryFilter(category);
+    navigate(`/?category=${category}`);
+    setFetching(true);
   };
 
-  const handleListClick = (listId) => {
-    setEditing((prevEditing) => !prevEditing);
+  const handleReminderClick = () => {
+    setReminderFilter(!reminderFilter);
+    navigate("/?reminder");
+    setFetching(true);
   };
 
-  const handleTrashClick = () => {
-    if (!selectMode) {
-      setSelectMode(true); // Enable selection mode
-      setSelectedLists([]); // Reset selected lists
+  const handleEditClick = (list) => {
+    setEditing(!editing);
+    if (!editing) {
+      setListEditing(list);
     } else {
-      // Call API to delete selected lists
-      const deletePromises = selectedLists.map((listId) => {
-        const url = `http://127.0.0.1:8000/list/${listId}`;
-        const headers = {
-          "Content-Type": "application/json", // API expects JSON
-          "X-CSRFToken": csrftoken, // Include CSRF token
-        };
+      setListEditing([]);
+    }
+  };
 
-        if (accessToken) {
-          headers["Authorization"] = `Bearer ${accessToken}`; // Include access token for auth
+  const handleSaveClick = async () => {
+    if (!adding) {
+      try {
+        let response = await axiosInstance.put(
+          `list/${listEditing.list_id}/`,
+          listEditing
+        );
+        if (response.status === 200) {
+          setEditing(false);
+          setListEditing([]);
+          toast.success("List updated successfully!");
+          setFetching(true);
+        } else if (response.status === 401) {
+          toast.error("Unauthorized");
+          return "Unauthorized";
+        } else if (response.status === 404) {
+          toast.error("Object not found");
+          return "Object not found";
         }
-
-        return fetch(url, { method: "DELETE", headers }).then((response) => {
-          if (!response.ok) {
-            console.error(`Failed to delete list with id ${listId}`);
-          } else {
-            console.log(`Successfully deleted list with id ${listId}`);
-          }
-        });
-      });
-
-      Promise.all(deletePromises)
-        .then(() => {
-          setFetching(true); // Trigger re-fetch after deletion
-          setSelectMode(false); // Exit selection mode
-        })
-        .catch((error) => console.error("Error deleting lists:", error));
-    }
-  };
-
-  const handleListSelect = (listId) => {
-    if (selectedLists.includes(listId)) {
-      setSelectedLists(selectedLists.filter((id) => id !== listId));
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
     } else {
-      setSelectedLists([...selectedLists, listId]);
+      try {
+        let response = await axiosInstance.post(`list/add/`, listEditing);
+        if (response.status === 201) {
+          setEditing(false);
+          setAdding(false);
+          setListEditing([]);
+          toast.success("List added successfully!");
+          setFetching(true);
+        } else if (response.status === 401) {
+          toast.error("Unauthorized");
+          return "Unauthorized";
+        } else if (response.status === 404) {
+          toast.error("Object not found");
+          return "Object not found";
+        }
+      } catch (error) {
+        console.error("Error saving data:", error);
+      }
     }
   };
 
-  // useEffect to trigger fetchLists when 'fetching' changes
-  useEffect(() => {
-    if (fetching) {
-      fetchLists(); // Fetch lists when the component mounts or fetching is true
+  const handleDeleteClick = async () => {
+    let response = await axiosInstance.delete(
+      `list/${listEditing.list_id}/`,
+      listEditing
+    );
+    if (response.status === 204) {
+      setEditing(false);
+      setListEditing([]);
+      setFetching(true);
+      toast.success("List deleted successfully!");
+    } else {
+      toast.error("Error deleting list");
+      return response.data;
     }
-  }, [fetching, fetchLists]);
+  };
 
   return (
     <div className="list-container">
+      <ToastContainer position="top-center" autoClose={3000} />
       {/* Logo */}
       <div className="header-container">
         <img
@@ -177,17 +172,16 @@ function List({ csrftoken, accessToken }) {
           src={Logo}
           alt="Logo"
           title="Home"
-          style={{
-            cursor: "pointer",
-          }}
+          style={{ cursor: "pointer" }}
           onClick={() => {
             setFetching(true);
-            navigate("/"); // Navigate after setting fetching to true
-            setSearchBar(""); // Clear Search bar
+            navigate("/");
+            setSearchBar("");
+            setCategoryFilter(""); // Reset the category filter
           }}
         />
         <div className="search-container">
-          <img src={searchLogo} alt="Search icon" className="search-icon" />
+          <img src={search} alt="Search icon" className="search-icon" />
           <input
             type="text"
             placeholder="Search..."
@@ -199,12 +193,12 @@ function List({ csrftoken, accessToken }) {
         <img
           id="pfp-icon"
           src={
-            userProfile?.picture
-              ? `http://127.0.0.1:8000${userProfile.picture}`
+            userProfile?.pfp
+              ? `http://127.0.0.1:8000${userProfile.pfp}`
               : "/default-profile.png"
           }
           alt="Profile"
-          title="Profile Settings"
+          title="Profile"
           style={{
             width: "80px",
             height: "80px",
@@ -212,122 +206,190 @@ function List({ csrftoken, accessToken }) {
             borderRadius: "50%",
             cursor: "pointer",
           }}
-          onClick={() => navigate("profile/")} // Correctly call the function here
+          onClick={() => navigate("user/")}
         />
       </div>
+
       <div className="body-container">
         <div className="content-text">
-          <h1>My Lists</h1>
-          <a href="/?category=to-do">To-Do</a>
-          <a href="/?category=task">Task</a>
-          <a href="/?category=shop">Shop</a>
+          <h1
+            onClick={() => {
+              setFetching(true);
+              navigate("/");
+              setSearchBar("");
+              setCategoryFilter(""); // Reset the category filter
+            }}
+            style={{ cursor: "pointer" }}
+          >
+            My Lists
+          </h1>
+          <p
+            onClick={() => handleCategoryClick("to-do")}
+            style={{ cursor: "pointer" }}
+          >
+            To-Do
+          </p>
+          <p
+            onClick={() => handleCategoryClick("task")}
+            style={{ cursor: "pointer" }}
+          >
+            Task
+          </p>
+          <p
+            onClick={() => handleCategoryClick("shop")}
+            style={{ cursor: "pointer" }}
+          >
+            Shop
+          </p>
         </div>
         <div className="content-container">
           <div className="side-bar">
-            
             <p
               title="Add New List"
-              onClick={() => navigate("add/")}
+              onClick={() => {
+                setAdding(!adding);
+                setEditing(!editing);
+              }}
+              style={{ cursor: "pointer" }}
             >
-              <VscEdit className="icon" />
+              <img src={file} alt="file icon" className="file-icon" />
               Add List
             </p>
-
-            <p  title="Check Reminders">
-              <VscBell className="icon" />
+            <p
+              title="Lists with Reminder"
+              onClick={handleReminderClick}
+              style={{ cursor: "pointer" }}
+            >
+              <img src={bell} alt="Reminder icon" className="reminder-icon" />
               Reminders
             </p>
-
-            <p  title="Delete Lists" onClick={handleTrashClick} >
-              <VscTrash className="icon" />
-              {selectMode ? "Delete" : "Trash"}
-            </p>
-
+            {editing ? (
+              <p
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  handleDeleteClick();
+                }}
+              >
+                <img src={trash} alt="trash icon" className="trash-icon" />
+                Trash
+              </p>
+            ) : null}
           </div>
-
+          <div className={`list-selectable ${editing ? "editing" : ""}`}>
+            <div className="list-selectable-header">
+              <select
+                className="category-input"
+                value={listEditing.category || ""}
+                onChange={(e) =>
+                  setListEditing({ ...listEditing, category: e.target.value })
+                }
+              >
+                <option value="">Category</option>
+                <option value="to-do">To-Do</option>
+                <option value="shop">Shop</option>
+                <option value="yask">Task</option>
+              </select>
+              <input
+                className="title-input"
+                placeholder="Title"
+                value={listEditing.title || ""}
+                onChange={(e) =>
+                  setListEditing({ ...listEditing, title: e.target.value })
+                }
+              />
+              <button
+                className="save-btn"
+                onClick={() => {
+                  handleSaveClick();
+                }}
+              >
+                Save
+              </button>
+            </div>
+            <div className="list-selectable-body">
+              <textarea
+                className="text-input"
+                placeholder="Text"
+                value={listEditing.text || ""}
+                onChange={(e) => {
+                  const target = e.target;
+                  setListEditing({ ...listEditing, text: target.value });
+                }}
+                ref={(textarea) => {
+                  if (textarea) {
+                    textarea.style.height = "auto"; // Reset height
+                    textarea.style.height = `${textarea.scrollHeight}px`; // Set to scrollHeight
+                  }
+                }}
+              />
+            </div>
+            <div className="list-selectable-footer">
+              {/* <img src={mice} alt="mice icon" className="mice-icon" /> */}
+              {/* <img
+                src={imageDark}
+                alt="imageDark icon"
+                className="imageDark-icon"
+              /> */}
+              <img
+                src={bellDark}
+                alt="bellDark icon"
+                className="bellDark-icon"
+              />
+              <img src={send} alt="send icon" className="send-icon" />
+            </div>
+          </div>
           {/* List Mapping */}
-          <div className={`list-action ${editing ? "is-editing" : ""}`}>
-            <div className="list-action-header">
-              <p>Category:</p>
-              <input id="title-input" type="text" placeholder="Title" />
-              <button>Save</button>
-            </div>
-            <div className="list-action-body">
-              <input id="text-input" type="text" placeholder="Text here ..." />
-            </div>
-            <div className="list-action-icons">
-              <VscMic className="icon" title="Voice-To-Text" />
-              <VscFileMedia className="icon" title="Add Media" />
-              <VscBell className="icon" title="Add Reminder" />
-              <VscSend className="icon" title="Share" />
-            </div>
-          </div>
-          <div className={`list-map  ${editing ? "is-editing" : ""}`}>
+          <div className={`list-map ${editing ? "editing" : ""}`}>
             {lists.length > 0 ? (
               lists.map((list) => (
                 <div
                   key={list.list_id}
-                  className={`list-wrapper ${
-                    selectMode && selectedLists.includes(list.list_id)
-                      ? "selected"
-                      : ""
-                  }`}
+                  className={` list-wrapper  ${editing ? "editing" : ""}`}
                 >
-                  {selectMode && (
-                    <input
-                      type="checkbox"
-                      checked={selectedLists.includes(list.list_id)}
-                      onChange={() => handleListSelect(list.list_id)}
-                    />
-                  )}
                   <div className="list-header">
-                    <p>
-                      {list.pined ? (
-                        <VscPinned
-                          title="Pinned"
-                          className="pin-icon"
-                          onClick={() => handlePinClick(list.list_id)}
-                        />
-                      ) : null}
-                      <span>
-                        <span
-                          style={{
-                            color: "#e95a44",
-                          }}
-                        >
-                          {list.category}
-                        </span>{" "}
-                        <span
-                          style={{
-                            fontSize: "15px",
-                          }}
-                        >
-                          {list.created_at.replace(/-/g, ".").slice(0, 10)}
-                        </span>
-                      </span>
-                      <VscGoToEditingSession
-                        style={{
-                          marginLeft: "50%",
-                          color: "#e95a44",
-                          fontSize: "25px",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleListClick(list.list_id)}
-                        title="Edit List"
-                      />
+                    {list.pined ? (
+                      <img src={pin} alt="pin icon" className="pin-icon" />
+                    ) : null}
+                    <p style={{ color: "#e95a44" }}>{list.category}</p>
+                    <p style={{ fontSize: "15px" }}>
+                      {list.created_at.replace(/-/g, ".").slice(0, 10)}
                     </p>
-                    <p>Private: {list.private ? "yes" : "no"}</p>
-                    <p>Reminder: {list.reminder || "no"} </p>
+                    <img
+                      src={edit}
+                      alt="edit icon"
+                      className="edit-icon"
+                      title="Edit List"
+                      style={
+                        list.pined
+                          ? {
+                              marginLeft: "40%",
+                              color: "#e95a44",
+                              fontSize: "25px",
+                              cursor: "pointer",
+                            }
+                          : {
+                              marginLeft: "60%",
+                              color: "#e95a44",
+                              fontSize: "25px",
+                              cursor: "pointer",
+                            }
+                      }
+                      onClick={() => handleEditClick(list)}
+                    />
+                    {/* <p>Private: {list.private ? "yes" : "no"}</p> */}
+                    {/* <p>Reminder: {list.reminder || "no"}</p> */}
                   </div>
                   <div className="list-body">
-                    <p
-                      style={{
-                        borderBottom: "1px white solid",
-                      }}
-                    >
-                      Title: {list.title}
+                    <p style={{ borderBottom: "1px white solid" }}>
+                      {list.title}
                     </p>
-                    <p>{list.private ? null : ` Text: ${list.text}`}</p>
+                    <p>
+                      {list.private
+                        ? null
+                        : `${list.text.substring(0, 270)}${
+                            list.text.length > 270 ? "..." : ""
+                          }`}
+                    </p>
                     <p>
                       {list.pictures > 0 ? (
                         <img
@@ -344,11 +406,12 @@ function List({ csrftoken, accessToken }) {
                 style={{
                   textAlign: "center",
                   width: "50%",
-                  margin: "0 auto",
-                  color: "#172a39",
+                  color: "red",
+                  marginLeft: "100%",
+                  marginTop: "10%",
                 }}
               >
-                No lists to show. Why not add one now! :D
+                No lists found
               </p>
             )}
           </div>

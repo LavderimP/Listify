@@ -24,7 +24,6 @@ class ListSerializer(serializers.ModelSerializer):
             "title",
             "pictures",
             "category",
-            "list_status",
             "reminder",
             "pined",
             "private",
@@ -33,6 +32,7 @@ class ListSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "created_at": {"format": "%Y-%m-%d %H:%M:%S"},
             "updated_at": {"format": "%Y-%m-%d %H:%M:%S"},
+            "reminder": {"format": "%Y-%m-%d %H:%M:%S"},
             "private_pass": {"required": False},
         }
 
@@ -51,10 +51,11 @@ class ListSerializer(serializers.ModelSerializer):
             # Return only limited info for private lists in list view
             return {
                 "created_at": instance.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "updated_at": instance.updated_at.strftime("%Y-%m-%d %H:%M:%S"),
+                "reminder": instance.reminder.strftime("%Y-%m-%d %H:%M:%S"),
                 "list_id": instance.list_id,
                 "title": instance.title,
                 "category": instance.category,
-                "reminder": instance.reminder,
                 "pined": instance.pined,
                 "private": instance.private,
             }

@@ -30,7 +30,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(unique=True, max_length=30, blank=True)
     fullname = models.CharField(max_length=30, blank=True)
     pfp = models.ImageField(
-        upload_to="media/pfp/", blank=True, null=True
+        upload_to="media/pfp/",
+        blank=True,
+        null=True,
+        default="media/pfp/profile_pic.png",
     )
     premium = models.BooleanField(default=False)
     premium_until = models.DateTimeField(blank=True, null=True)
