@@ -21,10 +21,8 @@ urlpatterns = [
         name="list_detail",
     ),
     path(
-        "pin/<int:pk>/",
-        ListViewSet.as_view(
-            {"get": "pin"},
-        ),
-        name="pin",
+        "download/<int:pk>/",
+        ListViewSet.as_view({"get": "download"}),
+        name="list_download",
     ),
 ]

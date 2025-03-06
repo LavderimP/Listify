@@ -11,13 +11,11 @@ import Logo from "../../assets/Logo.png";
 import search from "../../assets/search.svg";
 import file from "../../assets/file.svg"; // For Adding Lists
 import pin from "../../assets/pin.svg"; // For Pinned Lists
+import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
 import bell from "../../assets/bell.svg"; // For Reminder Filter
+import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
 import edit from "../../assets/edit.svg"; // For Editing Lists
 import trash from "../../assets/trash.svg"; // For Deleting Lists
-
-import send from "../../assets/send.svg"; // For Sending Lists
-import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
-import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
 
 // Notifications
 import { ToastContainer, toast } from "react-toastify";
@@ -34,6 +32,8 @@ function List() {
   const [searchBar, setSearchBar] = useState(""); // For search bar
   const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
   const [reminderFilter, setReminderFilter] = useState(false); // For reminder filter
+  const [showCalendar, setShowCalendar] = useState(false); // For calendar
+  const [showDropdown, setShowDropdown] = useState(false); // For download dropdown
 
   const [fetching, setFetching] = useState(true); // To handle fetching state
   const navigate = useNavigate(); // To handle navigation
@@ -80,6 +80,14 @@ function List() {
     }
   };
 
+  const handleDateChange = (event) => {
+    if (event.target.value) {
+      setListEditing({ ...listEditing, reminder: event.target.value });
+    } else {
+      setListEditing({ ...listEditing, reminder: null });
+    }
+  };
+
   const handleCategoryClick = (category) => {
     setCategoryFilter(category);
     navigate(`/?category=${category}`);
@@ -113,6 +121,9 @@ function List() {
           setListEditing([]);
           toast.success("List updated successfully!");
           setFetching(true);
+        } else if (response.status === 400) {
+          toast.error("Bad request");
+          return "Bad request";
         } else if (response.status === 401) {
           toast.error("Unauthorized");
           return "Unauthorized";
@@ -158,6 +169,43 @@ function List() {
     } else {
       toast.error("Error deleting list");
       return response.data;
+    }
+  };
+
+  // Function to toggle the dropdown visibility
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  // Function to handle file download (JSON or Excel)
+  const handleDownload = async (fileFormat) => {
+    try {
+      const response = await axiosInstance.get(
+        `/list/download/${listEditing.list_id}/?file_format=${fileFormat}`,
+        {
+          responseType: "blob", // Important: to handle binary data (file)
+        }
+      );
+
+      // Check if the response is successful (status 200)
+      if (response.status === 200) {
+        const blob = response.data;
+        const fileName = `list.${fileFormat === "json" ? "json" : "xlsx"}`;
+
+        // Create an object URL and trigger the file download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } else {
+        toast.error("Error downloading file");
+      }
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Error downloading file");
     }
   };
 
@@ -223,22 +271,40 @@ function List() {
             My Lists
           </h1>
           <p
-            onClick={() => handleCategoryClick("to-do")}
+            onClick={() => handleCategoryClick("personal")}
             style={{ cursor: "pointer" }}
           >
-            To-Do
+            Personal
           </p>
           <p
-            onClick={() => handleCategoryClick("task")}
+            onClick={() => handleCategoryClick("work")}
             style={{ cursor: "pointer" }}
           >
-            Task
+            Work
           </p>
           <p
-            onClick={() => handleCategoryClick("shop")}
+            onClick={() => handleCategoryClick("home")}
             style={{ cursor: "pointer" }}
           >
-            Shop
+            Home
+          </p>
+          <p
+            onClick={() => handleCategoryClick("books")}
+            style={{ cursor: "pointer" }}
+          >
+            Books
+          </p>
+          <p
+            onClick={() => handleCategoryClick("article")}
+            style={{ cursor: "pointer" }}
+          >
+            Article
+          </p>
+          <p
+            onClick={() => handleCategoryClick("list")}
+            style={{ cursor: "pointer" }}
+          >
+            List
           </p>
         </div>
         <div className="content-container">
@@ -284,9 +350,12 @@ function List() {
                 }
               >
                 <option value="">Category</option>
-                <option value="to-do">To-Do</option>
-                <option value="shop">Shop</option>
-                <option value="yask">Task</option>
+                <option value="personal">Personal</option>
+                <option value="work">Work</option>
+                <option value="home">Home</option>
+                <option value="books">Books</option>
+                <option value="article">Article</option>
+                <option value="list">List</option>
               </select>
               <input
                 className="title-input"
@@ -323,17 +392,123 @@ function List() {
               />
             </div>
             <div className="list-selectable-footer">
-              {/* <img
-                src={imageDark}
-                alt="imageDark icon"
-                className="imageDark-icon"
-              /> */}
+              {listEditing.reminder ? (
+                <p style={{ color: "#e95a44" }}>
+                  {listEditing.reminder
+                    .replace(/-/g, ".")
+                    .replace("T", " ")
+                    .slice(0, 25)}
+                </p>
+              ) : null}
+              {listEditing.pined ? (
+                <img
+                  src={pin}
+                  alt="pin icon"
+                  title="Unpin List"
+                  className="pinDark-icon"
+                  onClick={() =>
+                    setListEditing({
+                      ...listEditing,
+                      pined: !listEditing.pined,
+                    })
+                  }
+                  style={{ cursor: "pointer", height: "1.5em" }}
+                />
+              ) : (
+                <img
+                  src={pinDark}
+                  alt="pinDark icon"
+                  title="Pin List"
+                  className="pinDark-icon"
+                  onClick={() =>
+                    setListEditing({
+                      ...listEditing,
+                      pined: !listEditing.pined,
+                    })
+                  }
+                  style={{ cursor: "pointer", height: "1.5em" }}
+                />
+              )}
+              {listEditing.reminder ? (
+                <img
+                  src={bell}
+                  alt="bell icon"
+                  title="Remove Reminder"
+                  className="bell-icon"
+                  onClick={() =>
+                    setListEditing({
+                      ...listEditing,
+                      reminder: null,
+                    })
+                  }
+                  style={{ cursor: "pointer", height: "1.5em" }}
+                />
+              ) : (
+                <img
+                  src={bellDark}
+                  alt="bellDark icon"
+                  title="Set Reminder"
+                  className="bellDark-icon"
+                  onClick={() => {
+                    setShowCalendar((prev) => !prev);
+                  }}
+                  style={{ cursor: "pointer", height: "1.5em" }}
+                />
+              )}
+
+              {showCalendar ? (
+                <input
+                  type="datetime-local"
+                  value={listEditing.reminder || ""}
+                  onChange={handleDateChange}
+                />
+              ) : null}
               <img
-                src={bellDark}
-                alt="bellDark icon"
-                className="bellDark-icon"
+                src={file}
+                alt="download file"
+                title="Download File"
+                style={{
+                  height: "1.5em",
+                  cursor: "pointer",
+                }}
+                onClick={toggleDropdown} // Toggle dropdown when image is clicked
               />
-              <img src={send} alt="send icon" className="send-icon" />
+
+              {/* Dropdown */}
+              {showDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    backgroundColor: "#fff",
+                    borderRadius: "4px",
+                    padding: "10px",
+                    marginTop: "-90px",
+                    width: "100px",
+                  }}
+                >
+                  <button
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "5px 10px",
+                    }}
+                    onClick={() => handleDownload("json")}
+                  >
+                    JSON
+                  </button>
+                  <button
+                    style={{
+                      background: "transparent",
+                      cursor: "pointer",
+                      padding: "5px 10px",
+                    }}
+                    onClick={() => handleDownload("excel")}
+                  >
+                    Excel
+                  </button>{" "}
+                </div>
+              )}
             </div>
           </div>
           {/* List Mapping */}
@@ -346,10 +521,17 @@ function List() {
                 >
                   <div className="list-header">
                     {list.pined ? (
-                      <img src={pin} alt="pin icon" className="pin-icon" />
+                      <img
+                        src={pin}
+                        alt="pin icon"
+                        className="pin-icon"
+                        style={{ cursor: "default" }}
+                      />
                     ) : null}
-                    <p style={{ color: "#e95a44" }}>{list.category}</p>
-                    <p style={{ fontSize: "15px" }}>
+                    <p style={{ color: "#e95a44", cursor: "default" }}>
+                      {list.category}
+                    </p>
+                    <p style={{ fontSize: "15px", cursor: "default" }}>
                       {list.created_at.replace(/-/g, ".").slice(0, 10)}
                     </p>
                     <p>
@@ -360,7 +542,7 @@ function List() {
                           className="bell-icon"
                           style={{
                             height: "1.5em",
-                            cursor: "pointer",
+                            cursor: "default",
                           }}
                         />
                       ) : null}
@@ -370,22 +552,17 @@ function List() {
                       alt="edit icon"
                       className="edit-icon"
                       title="Edit List"
-                      style={
-                        list.pined
-                          ? {
-                              marginLeft: "40%",
-                              marginBottom: "10%",
-                              color: "#e95a44",
-                              fontSize: "25px",
-                              cursor: "pointer",
-                            }
-                          : {
-                              marginLeft: "55%",
-                              color: "#e95a44",
-                              fontSize: "25px",
-                              cursor: "pointer",
-                            }
-                      }
+                      style={{
+                        marginLeft: list.pined
+                          ? list.reminder
+                            ? "35%"
+                            : "45%"
+                          : "50%",
+                        marginBottom: "10%",
+                        color: "#e95a44",
+                        fontSize: "25px",
+                        cursor: "pointer",
+                      }}
                       onClick={() => handleEditClick(list)}
                     />
                   </div>
