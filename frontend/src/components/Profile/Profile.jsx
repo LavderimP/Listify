@@ -6,6 +6,12 @@ import { VscArrowLeft } from "react-icons/vsc";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+import settingsIcon from "../../assets/settings.svg";
+import vector from "../../assets/vector.svg";
+import listIcon from "../../assets/list.svg";
+import logoutIcon from "../../assets/logout.svg";
+import plusIcon from "../../assets/plusIcon.png";
+
 function ProfileDetail({ onLogout }) {
   const [profileData, setProfileData] = useState({
     id: "",
@@ -22,6 +28,7 @@ function ProfileDetail({ onLogout }) {
     confirm_password: "",
   });
 
+  const [paymentMethodsData, setPaymentMethodsData] = useState([]);
   const [paymentData, setPaymentData] = useState([]);
 
   const [clicked, setClicked] = useState({
@@ -33,9 +40,8 @@ function ProfileDetail({ onLogout }) {
   const [fetching, setFetching] = useState(true);
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("accessToken");
-
   useEffect(() => {
+    document.title = "Profile";
     if (fetching) {
       getProfile();
     }
@@ -58,23 +64,6 @@ function ProfileDetail({ onLogout }) {
       console.log("Error fetching profile data: ", error);
     } finally {
       setFetching(false);
-    }
-
-    if (clicked.paymentsClick) {
-      getPayments();
-    }
-  };
-
-  const getPayments = async () => {
-    try {
-      let response = await axiosInstance.get("payments/");
-      if (response.status === 200) {
-        setPaymentData(response.data);
-      } else if (response.status === 401) {
-        return "Unauthorized!";
-      }
-    } catch (error) {
-      console.log("Error fetching payment data: ", error);
     }
   };
 
@@ -161,6 +150,32 @@ function ProfileDetail({ onLogout }) {
     }
   };
 
+  const getPayments = async () => {
+    try {
+      let response = await axiosInstance.get("payment/");
+      if (response.status === 200) {
+        setPaymentMethodsData(response.data);
+        console.log("Payments data: ", response.data);
+      } else if (response.status === 401) {
+        return "Unauthorized!";
+      }
+    } catch (error) {
+      console.log("Error fetching payments data: ", error);
+    }
+
+    try {
+      let response = await axiosInstance.get("payment/payments/");
+      if (response.status === 200) {
+        setPaymentData(response.data);
+        console.log("Payments data: ", response.data);
+      } else if (response.status === 401) {
+        return "Unauthorized!";
+      }
+    } catch (error) {
+      console.log("Error fetching payments data: ", error);
+    }
+  };
+
   return (
     <div className="profile-container">
       <ToastContainer position="top-center" autoClose={3000} />
@@ -171,6 +186,17 @@ function ProfileDetail({ onLogout }) {
             navigate("/");
           }}
           title="Back to Home"
+        />
+        <img
+          src={settingsIcon}
+          alt="Settings"
+          style={{
+            position: "fixed",
+            height: "30px",
+            width: "50px",
+            top: "13.3em",
+            left: "6em",
+          }}
         />
         <h2
           title="Edit Profile"
@@ -186,6 +212,17 @@ function ProfileDetail({ onLogout }) {
         >
           Profile Settings
         </h2>
+        <img
+          src={vector}
+          alt="Vector"
+          style={{
+            position: "fixed",
+            height: "30px",
+            width: "50px",
+            top: "17.8em",
+            left: "6em",
+          }}
+        />
         <h2
           title="Password"
           style={{ cursor: "pointer" }}
@@ -200,20 +237,45 @@ function ProfileDetail({ onLogout }) {
         >
           Password
         </h2>
+        <img
+          src={listIcon}
+          alt="Vector"
+          style={{
+            position: "fixed",
+            height: "30px",
+            width: "50px",
+            top: "22.6em",
+            left: "6em",
+          }}
+        />
         <h2
           title="Payments"
           style={{ cursor: "pointer" }}
           onClick={() =>
-            setClicked((prevState) => ({
-              ...prevState,
-              profileClick: false,
-              passwordClick: false,
-              paymentsClick: true,
-            }))
+            setClicked(
+              (prevState) => ({
+                ...prevState,
+                profileClick: false,
+                passwordClick: false,
+                paymentsClick: true,
+              }),
+              getPayments()
+            )
           }
         >
           Payments
         </h2>
+        <img
+          src={logoutIcon}
+          alt="Vector"
+          style={{
+            position: "fixed",
+            height: "30px",
+            width: "50px",
+            bottom: "5.8em",
+            left: "8.5em",
+          }}
+        />
         <button
           className="logout-btn"
           type="button"
@@ -328,7 +390,52 @@ function ProfileDetail({ onLogout }) {
         ) : null}
         {clicked.paymentsClick ? (
           <>
-            <h1>Payments</h1>
+            {paymentData.length > 0 ? (
+              <div className="payments-methods-container">
+                <h1>My Cards</h1>
+                <br />
+                {paymentMethodsData.map((payment) => (
+                  <div key={payment.id} className="card-map">
+                    <h2>{payment.card_brand}</h2>
+                    <p>{payment.last4}</p>
+                    <p>Card no. {payment.payment_method_id}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No cards found.</p>
+            )}
+            <button className="AddCard-btn">
+              {" "}
+              <img
+                src={plusIcon}
+                alt="plusIcon"
+                style={{
+                  height: "50px",
+                  width: "50px",
+                  marginLeft: "5px",
+                }}
+              />
+              <br />
+              Add card
+            </button>
+            {paymentData.length > 0 ? (
+              <div className="payments-container">
+                <h1>Payments</h1>
+                <br />
+                {paymentData.map((payment) => (
+                  <div key={payment.id} className="payment-map">
+                    <p>Payment created date: {payment.created_at}</p>
+                    <p>Payment updated date: {payment.updated_at}</p>
+                    <p>Amount: {payment.amount}</p>
+                    <p>Currency: {payment.currency}</p>
+                    <p>Card: {payment.payment_method}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p>No payments found.</p>
+            )}
           </>
         ) : null}
       </div>

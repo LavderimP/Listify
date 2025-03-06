@@ -1,15 +1,12 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from .models import List, ListPictures
+from .models import List
 from user.models import User
 from .serializers import ListSerializer
 from django.shortcuts import get_object_or_404
 
 # ! To Be Removed
 # from rest_framework.permissions import AllowAny
-
-
-# TODO: List Pictures
 
 
 # * List Views
@@ -40,8 +37,7 @@ class ListViewSet(viewsets.ViewSet):
 
         queryset = queryset.order_by("created_at")
 
-        # Use ListSerializer for list view to hide private content
-        serializer = ListSerializer(queryset, many=True, context={"list": True})
+        serializer = ListSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request):
@@ -51,10 +47,6 @@ class ListViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_401_UNAUTHORIZED)
 
         serializer = ListSerializer(data=request.data)
-
-        # pictures = request.FILES.getlist(
-        #     "pictures"
-        # )  # Use FILES for file uploads and getlist for multiple files
 
         if serializer.is_valid():
             # Set the user before saving

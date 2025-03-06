@@ -27,12 +27,12 @@ body {
   && h2 {
     color: gray;
     margin-left: 5em;
-    margin-top: 0.5em;
+    margin-top: 1em;
     font-weight: 50;
     font-size: 30px;
   }
   && button {
-    margin-top: 25em;
+    margin-top: 20em;
     margin-left: 25%;
     width: 30%;
     background-color: #d9d9d9;
@@ -74,5 +74,54 @@ body {
     color: gray;
     margin-top: auto;
     margin-bottom: 5em;
+  }
+}
+
+.payments-methods-container {
+  margin-left: -25em;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  && .card-map {
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 110%;
+    background-color: #707579;
+    padding-top: 10px;
+    padding-left: 30px;
+  }
+  && p,
+  h2 {
+    color: white;
+  }
+}
+
+.AddCard-btn {
+  width: 200px;
+  height: 150px;
+  position: relative;
+  left: 13em;
+  top: -9.8em;
+  border: none;
+  border-radius: 25px;
+}
+
+.payments-container {
+  margin-left: -25em;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  && .payment-map {
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    width: 200px;
+    height: 110%;
+    background-color: #707579;
+    padding-top: 10px;
+    padding-left: 20px;
+  }
+  && p {
+    color: white;
   }
 }
