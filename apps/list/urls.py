@@ -20,4 +20,9 @@ urlpatterns = [
         ),
         name="list_detail",
     ),
+    path(
+        "download/<int:pk>/",
+        ListViewSet.as_view({"get": "download"}),
+        name="list_download",
+    ),
 ]

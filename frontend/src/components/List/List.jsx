@@ -11,13 +11,11 @@ import Logo from "../../assets/Logo.png";
 import search from "../../assets/search.svg";
 import file from "../../assets/file.svg"; // For Adding Lists
 import pin from "../../assets/pin.svg"; // For Pinned Lists
+import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
 import bell from "../../assets/bell.svg"; // For Reminder Filter
+import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
 import edit from "../../assets/edit.svg"; // For Editing Lists
 import trash from "../../assets/trash.svg"; // For Deleting Lists
-
-import send from "../../assets/send.svg"; // For Sending Lists
-import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
-import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
 
 // Notifications
 import { ToastContainer, toast } from "react-toastify";
@@ -35,6 +33,7 @@ function List() {
   const [categoryFilter, setCategoryFilter] = useState(""); // For category filter
   const [reminderFilter, setReminderFilter] = useState(false); // For reminder filter
   const [showCalendar, setShowCalendar] = useState(false); // For calendar
+  const [showDropdown, setShowDropdown] = useState(false); // For download dropdown
 
   const [fetching, setFetching] = useState(true); // To handle fetching state
   const navigate = useNavigate(); // To handle navigation
@@ -170,6 +169,43 @@ function List() {
     } else {
       toast.error("Error deleting list");
       return response.data;
+    }
+  };
+
+  // Function to toggle the dropdown visibility
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  // Function to handle file download (JSON or Excel)
+  const handleDownload = async (fileFormat) => {
+    try {
+      const response = await axiosInstance.get(
+        `/list/download/${listEditing.list_id}/?file_format=${fileFormat}`,
+        {
+          responseType: "blob", // Important: to handle binary data (file)
+        }
+      );
+
+      // Check if the response is successful (status 200)
+      if (response.status === 200) {
+        const blob = response.data;
+        const fileName = `list.${fileFormat === "json" ? "json" : "xlsx"}`;
+
+        // Create an object URL and trigger the file download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } else {
+        toast.error("Error downloading file");
+      }
+    } catch (error) {
+      console.error("Download failed:", error);
+      toast.error("Error downloading file");
     }
   };
 
@@ -427,6 +463,52 @@ function List() {
                   onChange={handleDateChange}
                 />
               ) : null}
+              <img
+                src={file}
+                alt="download file"
+                title="Download File"
+                style={{
+                  height: "1.5em",
+                  cursor: "pointer",
+                }}
+                onClick={toggleDropdown} // Toggle dropdown when image is clicked
+              />
+
+              {/* Dropdown */}
+              {showDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    backgroundColor: "#fff",
+                    borderRadius: "4px",
+                    padding: "10px",
+                    marginTop: "-90px",
+                    width: "100px",
+                  }}
+                >
+                  <button
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      cursor: "pointer",
+                      padding: "5px 10px",
+                    }}
+                    onClick={() => handleDownload("json")}
+                  >
+                    JSON
+                  </button>
+                  <button
+                    style={{
+                      background: "transparent",
+                      cursor: "pointer",
+                      padding: "5px 10px",
+                    }}
+                    onClick={() => handleDownload("excel")}
+                  >
+                    Excel
+                  </button>{" "}
+                </div>
+              )}
             </div>
           </div>
           {/* List Mapping */}
