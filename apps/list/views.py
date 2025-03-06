@@ -65,20 +65,6 @@ class ListViewSet(viewsets.ViewSet):
         serializer = ListSerializer(queryset)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def pin(self, request, pk=None):
-        try:
-            user_obj = get_object_or_404(User, id=request.user.id)
-        except User.DoesNotExist:
-            return Response(status=status.HTTP_401_UNAUTHORIZED)
-
-        queryset = get_object_or_404(List, user=user_obj, list_id=pk)
-
-        # Toggle the pined status
-        queryset.pined = not queryset.pined
-        queryset.save()
-
-        return Response(status=status.HTTP_200_OK)
-
     def update(self, request, pk=None):
         try:
             user_obj = get_object_or_404(User, id=request.user.id)

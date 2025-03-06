@@ -20,11 +20,4 @@ urlpatterns = [
         ),
         name="list_detail",
     ),
-    path(
-        "pin/<int:pk>/",
-        ListViewSet.as_view(
-            {"get": "pin"},
-        ),
-        name="pin",
-    ),
 ]

@@ -16,9 +16,12 @@ class List(models.Model):
     # * Fields
     title = models.TextField(max_length=30)
     CATEGORY_CHOICES = [
-        ("to-do", "To-Do"),
-        ("task", "Task"),
-        ("shop", "Shop"),
+        ("personal", "Personal"),
+        ("work", "Work"),
+        ("home", "Home"),
+        ("books", "Books"),
+        ("article", "Article"),
+        ("list", "List"),
     ]
     category = models.CharField(
         max_length=10, choices=CATEGORY_CHOICES, null=True, blank=True
