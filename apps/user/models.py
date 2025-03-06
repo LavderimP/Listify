@@ -84,8 +84,12 @@ class User(AbstractBaseUser, PermissionsMixin):
         Overriding the save method to automatically create a Stripe customer
         when a new user is created, and activate the user account.
         """
-        new_customer = stripe.Customer.create(email=self.email)
-        self.customer_id = new_customer.id
+        try:
+            new_customer = stripe.Customer.create(email=self.email)
+            self.customer_id = new_customer.id
+        except stripe.error.StripeError as e:
+            print(f"Error creating Stripe customer: {e}")
+            
         self.is_active = True
         super().save(*args, **kwargs)
 

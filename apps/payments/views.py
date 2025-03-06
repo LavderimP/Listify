@@ -4,9 +4,12 @@ from payments.serializers import PaymentSerializer, PaymentMethodsSerializer
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import  IsAuthenticated
 
 class PaymentMethodsViewSet(viewsets.ViewSet):
     '''ViewSet for managing PaymentMethods related to a user.'''
+
+    permission_classes = [IsAuthenticated]  # Requires authentication for all methods
 
     def list(self, request):
         '''
