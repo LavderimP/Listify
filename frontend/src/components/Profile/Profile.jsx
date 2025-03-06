@@ -140,6 +140,27 @@ function ProfileDetail({ onLogout }) {
     }
   };
 
+  const updatePassword = async () => {
+    try {
+      let response = await axiosInstance.put("user/password/", {
+        old_password: passwordData.old_password,
+        new_password: passwordData.new_password,
+        confirm_password: passwordData.confirm_password,
+      });
+
+      if (response.status === 200) {
+        console.log("Password updated successfully.");
+        toast.success("Password updated successfully.");
+      } else if (response.status === 401) {
+        toast.error("Unauthorized!");
+        return "Unauthorized!";
+      }
+    } catch (error) {
+      toast.error("Error updating password.");
+      console.log("Error updating password: ", error);
+    }
+  };
+
   return (
     <div className="profile-container">
       <ToastContainer position="top-center" autoClose={3000} />
@@ -298,7 +319,7 @@ function ProfileDetail({ onLogout }) {
               className="save-btn"
               title="Change Password"
               onClick={() => {
-                console.log("Change Password");
+                updatePassword();
               }}
             >
               Change Password
