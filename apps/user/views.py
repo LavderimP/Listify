@@ -5,14 +5,20 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import User
 from .serializers import UserSerializer
 
-
 class UserCreateView(viewsets.ViewSet):
-    permission_classes = [AllowAny]  # Allow open registration
+    """
+    API endpoint to handle user registration.
+    Allows any user to create an account.
+    """
+    permission_classes = [AllowAny]  # Open registration
 
     def create(self, request):
+        """
+        Handles user creation with password confirmation validation.
+        """
         serializer = UserSerializer(data=request.data)
-        pass1 = request.data["password"]
-        pass2 = request.data["password_confirm"]
+        pass1 = request.data.get("password")
+        pass2 = request.data.get("password_confirm")
 
         if not pass1:
             return Response(
@@ -41,27 +47,25 @@ class UserCreateView(viewsets.ViewSet):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserActionView(viewsets.ViewSet):
-    # TODO Update the pk arg in retreive update and delete (delete needs to be deleted and made with password check)
-    permission_classes = [IsAuthenticated]  # Ensure only authenticated users access
+    """
+    API endpoints for authenticated users to retrieve, update, delete accounts, and update passwords.
+    """
+    permission_classes = [IsAuthenticated]  # Only authenticated users can access
 
     def retrieve(self, request):
-        req_user = request.user.id
-        user = get_object_or_404(User, id=req_user)
+        """
+        Retrieve the currently authenticated user's data.
+        """
+        user = get_object_or_404(User, id=request.user.id)
         serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request):
-        req_user = request.user.id
-        user = get_object_or_404(User, id=req_user)
-
-        if req_user != user.id:
-            return Response(
-                {"detail": "Cannot update someone else's user data."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
+        """
+        Update user data for the authenticated user.
+        """
+        user = get_object_or_404(User, id=request.user.id)
         serializer = UserSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -69,17 +73,10 @@ class UserActionView(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request):
-        req_user = request.user  # Get the authenticated user
-
-        # Get the profile or return 404 if not found
-        user = get_object_or_404(User, id=req_user.id)
-
-        if req_user.id != user.id:
-            return Response(
-                {"detail": "Cannot delete someone else's profile."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
+        """
+        Delete the authenticated user's account after password verification.
+        """
+        user = get_object_or_404(User, id=request.user.id)
         password = request.data.get("password")
 
         if not password:
@@ -92,22 +89,17 @@ class UserActionView(viewsets.ViewSet):
                 {"detail": "Incorrect Password!"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        user.delete()  # Deletes the user and cascades to profile
+        user.delete()  # Deletes the user account
         return Response(
-            {"detail": "User account and associated profile deleted"},
+            {"detail": "User account deleted successfully."},
             status=status.HTTP_204_NO_CONTENT,
         )
 
     def password_update(self, request):
-        req_user = request.user.id
-        user = get_object_or_404(User, id=req_user)
-
-        if req_user != user.id:
-            return Response(
-                {"detail": "Cannot update someone else's password."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
-
+        """
+        Allows authenticated users to update their password.
+        """
+        user = get_object_or_404(User, id=request.user.id)
         old_pass = request.data.get("old_password")
         new_pass = request.data.get("new_password")
         confirm_pass = request.data.get("confirm_password")
@@ -138,11 +130,11 @@ class UserActionView(viewsets.ViewSet):
 
         if not user.check_password(old_pass):
             return Response(
-                {"detail": "Incorrect Old Password!"},
-                status=status.HTTP_400_BAD_REQUEST,
+                {"detail": "Incorrect Old Password!"}, status=status.HTTP_400_BAD_REQUEST
             )
 
         user.set_password(new_pass)
+        user.save()
 
         return Response(
             {"detail": "Password updated successfully!"}, status=status.HTTP_200_OK
