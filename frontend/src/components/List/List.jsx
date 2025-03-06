@@ -16,10 +16,8 @@ import edit from "../../assets/edit.svg"; // For Editing Lists
 import trash from "../../assets/trash.svg"; // For Deleting Lists
 
 import send from "../../assets/send.svg"; // For Sending Lists
-import imageDark from "../../assets/image-dark.svg"; // For Adding Images
 import bellDark from "../../assets/bell-dark.svg"; // For Reminder Filter
 import pinDark from "../../assets/pin-dark.svg"; // For Pinned Lists
-import mice from "../../assets/mice.svg"; // For Pinned Lists
 
 // Notifications
 import { ToastContainer, toast } from "react-toastify";
@@ -41,6 +39,7 @@ function List() {
   const navigate = useNavigate(); // To handle navigation
 
   useEffect(() => {
+    document.title = "Home"; // Set the title of the page
     if (fetching) {
       getLists();
     }
@@ -324,7 +323,6 @@ function List() {
               />
             </div>
             <div className="list-selectable-footer">
-              {/* <img src={mice} alt="mice icon" className="mice-icon" /> */}
               {/* <img
                 src={imageDark}
                 alt="imageDark icon"
@@ -354,6 +352,19 @@ function List() {
                     <p style={{ fontSize: "15px" }}>
                       {list.created_at.replace(/-/g, ".").slice(0, 10)}
                     </p>
+                    <p>
+                      {list.reminder ? (
+                        <img
+                          src={bell}
+                          alt="bell icon"
+                          className="bell-icon"
+                          style={{
+                            height: "1.5em",
+                            cursor: "pointer",
+                          }}
+                        />
+                      ) : null}
+                    </p>
                     <img
                       src={edit}
                       alt="edit icon"
@@ -363,12 +374,13 @@ function List() {
                         list.pined
                           ? {
                               marginLeft: "40%",
+                              marginBottom: "10%",
                               color: "#e95a44",
                               fontSize: "25px",
                               cursor: "pointer",
                             }
                           : {
-                              marginLeft: "60%",
+                              marginLeft: "55%",
                               color: "#e95a44",
                               fontSize: "25px",
                               cursor: "pointer",
@@ -376,27 +388,14 @@ function List() {
                       }
                       onClick={() => handleEditClick(list)}
                     />
-                    {/* <p>Private: {list.private ? "yes" : "no"}</p> */}
-                    {/* <p>Reminder: {list.reminder || "no"}</p> */}
                   </div>
                   <div className="list-body">
                     <p style={{ borderBottom: "1px white solid" }}>
                       {list.title}
                     </p>
                     <p>
-                      {list.private
-                        ? null
-                        : `${list.text.substring(0, 270)}${
-                            list.text.length > 270 ? "..." : ""
-                          }`}
-                    </p>
-                    <p>
-                      {list.pictures > 0 ? (
-                        <img
-                          src={`http://127.0.0.1:8000${list.pictures}`}
-                          alt="list picture"
-                        />
-                      ) : null}
+                      {list.text.substring(0, 270)}
+                      {list.text.length > 270 ? "..." : ""}
                     </p>
                   </div>
                 </div>

@@ -212,7 +212,7 @@ body {
 .pin-icon {
   font-size: 2em;
   cursor: pointer;
-  color: #fc573b;
+  padding-bottom: 10px;
 }
 
 .list-header {

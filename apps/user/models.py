@@ -1,5 +1,10 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 from django.db import models
+from django.conf import settings
+
+import stripe
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 class CustomUserManager(UserManager):
@@ -38,6 +43,9 @@ class User(AbstractBaseUser, PermissionsMixin):
     premium = models.BooleanField(default=False)
     premium_until = models.DateTimeField(blank=True, null=True)
 
+    # User billing info
+    customer_id = models.CharField(max_length=50, default="empty")
+
     USERNAME_FIELD = "username"
 
     def get_full_name(self):
@@ -50,6 +58,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username
 
     def save(self, *args, **kwargs):
+        new_customer = stripe.Customer.create(email=self.email)
+        self.customer_id = new_customer.id
         self.is_active = True
         super().save(*args, **kwargs)
 
