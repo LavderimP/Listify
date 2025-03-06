@@ -97,3 +97,53 @@ class UserActionView(viewsets.ViewSet):
             {"detail": "User account and associated profile deleted"},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+    def password_update(self, request):
+        req_user = request.user.id
+        user = get_object_or_404(User, id=req_user)
+
+        if req_user != user.id:
+            return Response(
+                {"detail": "Cannot update someone else's password."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        old_pass = request.data.get("old_password")
+        new_pass = request.data.get("new_password")
+        confirm_pass = request.data.get("confirm_password")
+
+        if not old_pass:
+            return Response(
+                {"detail": "Old Password cannot be empty!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not new_pass:
+            return Response(
+                {"detail": "New Password cannot be empty!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not confirm_pass:
+            return Response(
+                {"detail": "Confirmation Password cannot be empty!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if new_pass != confirm_pass:
+            return Response(
+                {"detail": "New Password and Confirmation Password don't match!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.check_password(old_pass):
+            return Response(
+                {"detail": "Incorrect Old Password!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        user.set_password(new_pass)
+
+        return Response(
+            {"detail": "Password updated successfully!"}, status=status.HTTP_200_OK
+        )
