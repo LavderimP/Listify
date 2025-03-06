@@ -9,7 +9,8 @@ from rest_framework.permissions import  IsAuthenticated
 class PaymentMethodsViewSet(viewsets.ViewSet):
     '''ViewSet for managing PaymentMethods related to a user.'''
 
-    permission_classes = [IsAuthenticated]  # Requires authentication for all methods
+    # Setting the permission class to only allow authenticated users
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
         '''
